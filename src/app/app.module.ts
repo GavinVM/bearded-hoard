@@ -9,6 +9,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatRadioModule } from '@angular/material/radio';
 import { AddEntriesComponent } from './add-entries/add-entries.components';
 import { EditEntriesComponent } from './edit-entries/edit-entries.component';
 import { ViewEntriesComponent } from './view-entries/view-entries.component';
@@ -32,6 +33,7 @@ import { AppDataService } from './services/appData.service';
     MatIconModule,
     MatButtonModule,
     MatGridListModule,
+    MatRadioModule,
   ],
   providers: [AppDataService],
   bootstrap: [AppComponent],

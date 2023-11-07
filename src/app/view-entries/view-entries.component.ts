@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppDataService } from '../services/appData.service';
 
 @Component({
@@ -9,7 +9,8 @@ import { AppDataService } from '../services/appData.service';
   styleUrls: ['./view-entries.component.css'],
 })
 export class ViewEntriesComponent {
-  constructor(private appDataService: AppDataService) {}
+  rowData;
+  gridApi!: GridApi;
 
   columnDefs: ColDef[] = [
     { field: 'title' },
@@ -17,7 +18,19 @@ export class ViewEntriesComponent {
     { field: 'certificate' },
   ];
 
-  rowData = this.appDataService.getEntries();
+  
 
-  @ViewChild('MyGrid') grid!: AgGridAngular;
+  constructor(private appDataService: AppDataService) {
+    this.rowData = this.appDataService.getEntries();
+  }
+  
+  public onGridReady(params: GridReadyEvent){
+    this.gridApi = params.api;
+  }
+
+  public switchView(viewType: string): void {
+    console.log(viewType)
+  }
+
+  
 }
