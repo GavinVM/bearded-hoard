@@ -3,5 +3,24 @@
     <mat-icon>menu</mat-icon>
   </button>
   <span>Mr Tracker</span>
-  <span class="example-spacer"></span>
 </mat-toolbar>
+<mat-grid-list cols=5> 
+  <mat-grid-tile></mat-grid-tile>
+  <mat-grid-tile>
+    <button mat-icon-button routerLink='/add-entries'>
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <button mat-icon-button routerLink='/view-entries'>
+      <mat-icon>grid_on</mat-icon>
+    </button>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <button mat-icon-button routerLink='/edit-entries'>
+      <mat-icon>edit</mat-icon>
+    </button>
+  </mat-grid-tile>
+  <mat-grid-tile></mat-grid-tile>
+</mat-grid-list>
+<router-outlet></router-outlet>

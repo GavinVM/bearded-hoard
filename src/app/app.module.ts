@@ -8,21 +8,32 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { AddEntriesComponent } from './add-entries/add-entries.components';
+import { EditEntriesComponent } from './edit-entries/edit-entries.component';
+import { ViewEntriesComponent } from './view-entries/view-entries.component';
+import { AgGridModule } from 'ag-grid-angular';
+import { AppDataService } from './services/appData.service';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AddEntriesComponent,
+    EditEntriesComponent,
+    ViewEntriesComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    AgGridModule,
     MatSlideToggleModule,
     MatToolbarModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatGridListModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [AppDataService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
