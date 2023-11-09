@@ -1,1 +1,14 @@
-<p>add</p>
+<form>
+    <mat-form-field>
+        <mat-label>Film Title</mat-label>
+        <input type="text" 
+            matInput 
+            [formControl]="filmSearch"
+            [matAutocomplete]="auto">
+        <mat-autocomplete #auto='matAutocomplete' [displayWith]="listResults">
+            @for (option of options | async; track option) {
+                <mat-option [value]="option">{{option.title}}</mat-option>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</form>

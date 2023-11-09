@@ -10,4 +10,8 @@ export class AppDataService {
   public getEntries() {
     return ENTRIES_MOCK;
   }
+
+  public getSearchResults(kind: string, searchCriteria: string){
+    let url = kind == 'movie'? MOVIEW_
+  }
 }
