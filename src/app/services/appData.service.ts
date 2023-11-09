@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment.development';
 import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
 
 @Injectable({
@@ -11,7 +12,9 @@ export class AppDataService {
     return ENTRIES_MOCK;
   }
 
-  public getSearchResults(kind: string, searchCriteria: string){
-    let url = kind == 'movie'? MOVIEW_
+  public getSearchResults(searchCriteria: string, kind?: string){
+    let url = kind? kind == 'movie'? environment.movieSearchUrl: environment.tvSearchUrl : environment.multiSearchUrl
+
+    
   }
 }
