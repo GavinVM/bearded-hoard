@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.development';
 import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
@@ -6,10 +7,10 @@ import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
   providedIn: 'root',
 })
 export class AppDataService {
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   public getEntries() {
-    return ENTRIES_MOCK;
+    return this.http.get(environment.entriesurl)
   }
 
   public getSearchResults(searchCriteria: string, kind?: string){

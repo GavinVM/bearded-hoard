@@ -9,7 +9,7 @@ import { AppDataService } from '../services/appData.service';
   styleUrls: ['./view-entries.component.css'],
 })
 export class ViewEntriesComponent {
-  rowData;
+  rowData!: any;
   gridApi!: GridApi;
 
   columnDefs: ColDef[] = [
@@ -21,11 +21,13 @@ export class ViewEntriesComponent {
   
 
   constructor(private appDataService: AppDataService) {
-    this.rowData = this.appDataService.getEntries();
   }
+
+  
   
   public onGridReady(params: GridReadyEvent){
     this.gridApi = params.api;
+    this.rowData = this.appDataService.getEntries();
   }
 
   public switchView(viewType: string): void {

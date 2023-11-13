@@ -11,7 +11,7 @@
 </mat-grid-list>
 <ag-grid-angular
     class="ag-theme-alpine-dark"
-    [rowData]="rowData"
+    [rowData]="rowData | async"
     [columnDefs]="columnDefs"
     [domLayout]="'print'"
 ></ag-grid-angular>
