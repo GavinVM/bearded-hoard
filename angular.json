@@ -62,10 +62,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "mr-tracker:build:production"
+              "buildTarget": "mr-tracker:build:production"
             },
             "development": {
-              "browserTarget": "mr-tracker:build:development"
+              "buildTarget": "mr-tracker:build:development"
             }
           },
           "defaultConfiguration": "development",
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "mr-tracker:build"
+            "buildTarget": "mr-tracker:build"
           }
         },
         "test": {
