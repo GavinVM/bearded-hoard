@@ -1,8 +1,9 @@
-<!-- <form>
+<form #entriesForm="">
     <mat-form-field>
         <mat-label>Film Title</mat-label>
         <input type="text" 
-            matInput 
+            matInput
+            placeholder="Enter Film title..." 
             [formControl]="filmSearch"
             [matAutocomplete]="auto">
         <mat-autocomplete #auto='matAutocomplete' [displayWith]="listResults">
@@ -11,4 +12,4 @@
             }
         </mat-autocomplete>
     </mat-form-field>
-</form> -->
+</form>

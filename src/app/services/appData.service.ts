@@ -7,7 +7,13 @@ import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
   providedIn: 'root',
 })
 export class AppDataService {
-  constructor(private http: HttpClient) {}
+  tmdbHeaders: HttpHeaders;
+  constructor(private http: HttpClient) {
+    this.tmdbHeaders = new HttpHeaders({
+      Authorization: `Bearer ${environment.accessTokenAuth}`,
+      'accept': 'application/json'
+    })
+  }
 
   public getEntries() {
     return this.http.get(environment.entriesurl)
@@ -16,6 +22,12 @@ export class AppDataService {
   public getSearchResults(searchCriteria: string, kind?: string){
     let url = kind? kind == 'movie'? environment.movieSearchUrl: environment.tvSearchUrl : environment.multiSearchUrl
 
+    return this.http.get(
+      url,
+      {
+        headers: this.tmdbHeaders,
+        params: { query: searchCriteria}
+      }
     
   }
 }
