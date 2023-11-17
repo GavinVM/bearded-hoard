@@ -18,21 +18,24 @@ export class ViewEntriesComponent {
     { field: 'certificate' },
   ];
 
-  
-
   constructor(private appDataService: AppDataService) {
+    this.appDataService.getEntries().subscribe({
+      next: (entries) => {
+        console.debug(entries);
+        this.rowData = entries;
+      },
+      error: (error) => {
+        console.error('returning entries failed, message to follow');
+        console.error(error);
+      },
+    });
   }
 
-  
-  
-  public onGridReady(params: GridReadyEvent){
+  public onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.rowData = this.appDataService.getEntries();
   }
 
   public switchView(viewType: string): void {
-    console.log(viewType)
+    console.log(viewType);
   }
-
-  
 }

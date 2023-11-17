@@ -15,6 +15,7 @@ import { EditEntriesComponent } from './edit-entries/edit-entries.component';
 import { ViewEntriesComponent } from './view-entries/view-entries.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { AppDataService } from './services/appData.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { AppDataService } from './services/appData.service';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     AgGridModule,
     MatSlideToggleModule,
     MatToolbarModule,
