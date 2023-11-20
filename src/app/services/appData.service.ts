@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.development';
 import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
@@ -20,14 +20,15 @@ export class AppDataService {
   }
 
   public getSearchResults(searchCriteria: string, kind?: string){
+    console.info(`AppDataService.getSearchResults:: Starting`)
     let url = kind? kind == 'movie'? environment.movieSearchUrl: environment.tvSearchUrl : environment.multiSearchUrl
-
+    console.info(`AppDataService.getSearchResults:: finishing`)
     return this.http.get(
       url,
       {
         headers: this.tmdbHeaders,
         params: { query: searchCriteria}
-      }
+      });
     
   }
 }

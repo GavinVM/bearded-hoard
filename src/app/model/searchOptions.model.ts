@@ -1,4 +1,4 @@
 export interface ISearchOptions {
   title: string;
-  mediaType: string;
+  id: string;
 }
