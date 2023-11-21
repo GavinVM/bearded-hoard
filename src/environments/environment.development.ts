@@ -1,6 +1,6 @@
 const baseTMDBUrl: string = 'https://api.themoviedb.org/3/';
-// const api: string = 'https://4gsgpp-8081.csb.app/api/';
-const api: string = 'http://localhost:8081/api/';
+const api: string = 'https://4gsgpp-8081.csb.app/api/';
+// const api: string = 'http://localhost:8081/api/';
 
 export const environment = {
   movieSearchUrl: baseTMDBUrl + 'search/movie',
