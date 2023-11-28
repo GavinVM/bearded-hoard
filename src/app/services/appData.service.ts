@@ -1,7 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { map } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
+import { Genre } from '../model/genre.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,5 +32,39 @@ export class AppDataService {
         params: { query: searchCriteria}
       });
     
+  }
+
+  public getMovieDetailsById(id: number){
+    return this.http.get(
+      environment.movieDetailsByIdUrl + id,
+      {
+        headers: this.tmdbHeaders
+      })
+  }
+
+  public getMovieGenreList(){
+    return this.http.get(
+      environment.movieGenreListUrl,
+      {
+        headers: this.tmdbHeaders
+      }
+    )
+  }
+
+  public getTvGenreList(){
+    return this.http.get(
+      environment.tvGenreListUrl,
+      {
+        headers: this.tmdbHeaders
+      }
+    )
+  }
+
+  public geTvDetailsById(id: number){
+    return this.http.get(
+      environment.tvDetailsByIdUrl + id,
+      {
+        headers: this.tmdbHeaders
+      })
   }
 }

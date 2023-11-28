@@ -15,6 +15,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatChipsModule } from '@angular/material/chips';
 import { AddEntriesComponent } from './add-entries/add-entries.components';
 import { EditEntriesComponent } from './edit-entries/edit-entries.component';
 import { ViewEntriesComponent } from './view-entries/view-entries.component';
@@ -45,6 +47,8 @@ import { HttpClientModule } from '@angular/common/http';
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
+    MatExpansionModule,
+    MatChipsModule,
     ReactiveFormsModule,
     AsyncPipe,
   ],

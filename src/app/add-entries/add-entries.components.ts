@@ -1,8 +1,11 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import { FormControl } from '@angular/forms';
 import { AppDataService } from '../services/appData.service';
-import { IEntry } from '../model/entry.model';
+import { Entry } from '../model/entry.model';
 import { ISearchOptions } from '../model/searchOptions.model';
+import { Genre } from '../model/genre.model';
+import { group } from '@angular/animations';
 
 @Component({
   selector: 'app-add-entries',
@@ -11,9 +14,15 @@ import { ISearchOptions } from '../model/searchOptions.model';
 })
 export class AddEntriesComponent implements OnInit {
   searchField!: FormControl;
-  newEnrtry!: IEntry;
+  newEnrtry!: Entry;
   results!: any;
   options!: ISearchOptions[];
+  genreList!: Genre[];
+  showForm!: boolean;
+  addOnBlur = true;
+  step!: number;
+
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(private appDataService: AppDataService) {
     this.searchField = new FormControl('');
@@ -22,25 +31,29 @@ export class AddEntriesComponent implements OnInit {
       title: '',
       overview: '',
       image: '',
-      apiGenreIds: [],
+      genres: [],
       apiId: 0,
       kind: '',
     };
   }
 
   ngOnInit() {
+    this.showForm = false;
     this.searchField.valueChanges.subscribe((val: string) => {
-      if (val.length > 3) {
+      if (val != '') {
         this.appDataService.getSearchResults(val).subscribe({
           next: (data: any) => {
             console.debug(data);
             this.results = data.results;
-            this.options = data.results.map((result: any) => {
+            this.options = data.results.filter((result:any) => result.media_type != 'person').map((result: any) => {
               return {
-                title: result.title,
+                title: result.media_type == 'tv'? result.name : result.title,
                 id: result.id,
+                mediaType: result.media_type
               };
             });
+            console.debug(`MrTracker.AddEntriesComponent.ngOnInit - next line is options`)
+            console.debug(this.options)
           },
           error: (error) => {
             console.error('oops');
@@ -48,43 +61,73 @@ export class AddEntriesComponent implements OnInit {
             this.options = [];
           },
         });
-      } else if (val == '') {
+      } else {
         this.options = [];
       }
     });
   }
 
-  selectedOptions(value: any) {
-    console.info(`current claue ${value}`);
-    let id = this.options.map((option: ISearchOptions) => {
-      if (option.title === value) {
-        return option.id;
-      } else {
-        return null;
+  selectedOptions(event: any) {
+    console.info(`MrTracker.AddEntriesComponent.selectedOtions - new line is the event object`);
+    console.debug(event.value)
+    let selection: ISearchOptions = event.value
+    this.searchField.setValue(selection.title)
+    let details = selection.mediaType === 'tv'? this.appDataService.geTvDetailsById(selection.id) : this.appDataService.getMovieDetailsById(selection.id);
+    
+    details.subscribe({
+      next: (details: any) => {
+          this.newEnrtry = {
+            title: details.title,
+            overview: details.overview,
+            image: details.poster_path,
+            genres: details.genres,
+            apiId: details.id,
+            kind: details.media_type,
+          };
+        console.debug(this.newEnrtry);
+        this.showForm = true;
+      },
+      error: (error) => {
+        console.error(error);
       }
-    });
-    console.info(`current options ${this.options}`);
-    console.info(`current claue ${id}`);
-    let tempResult: any;
-    if (id)
-      tempResult = this.results.map((result: any) => {
-        if (result.id === id) {
-          return result;
-        } else {
-          return null;
-        }
-      });
-    if (tempResult) {
-      console.info(`current claue ${tempResult}`);
-      this.newEnrtry = {
-        title: tempResult.title,
-        overview: tempResult.overview,
-        image: tempResult.poster_path,
-        apiGenreIds: tempResult.genre_ids,
-        apiId: tempResult.id,
-        kind: tempResult.media_type,
-      };
-    }
-    console.debug(this.newEnrtry);
+    })
   }
+
+  setStep(stepId:number){
+    this.step = stepId;
+  }
+
+  loadGenreList(mediaType:string){
+    let list = mediaType === 'tv'? this.appDataService.getTvGenreList() : this.appDataService.getMovieGenreList();
+    console.debug(list)
+    list.subscribe({
+      next: (genreListMaster: any) => {
+        console.debug(genreListMaster)
+        this.genreList = genreListMaster.genre
+      },
+      error: (error) => {
+        console.error(error)
+      }
+    })
+  }
+
+  updateGenreList(action:string, genreEntry:Genre, event?:any){
+    if(action === 'add'){
+
+      this.genreList.forEach((genre:Genre) => {
+        if(genre.name === genreEntry.name){
+          this.newEnrtry.genres.push({
+            name: genre.name,
+            id: genre.id
+          });
+        }
+      })
+
+      event?.chipInput?.clear();
+      
+    } else if(action === 'remove'){
+      this.newEnrtry.genres = this.newEnrtry.genres.filter(genre => genre.id != genreEntry.id);
+    } 
+  }
+
 }

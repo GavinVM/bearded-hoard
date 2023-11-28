@@ -1,8 +1,10 @@
-export interface IEntry {
+import { Genre } from "./genre.model"
+
+export interface Entry {
     title: string,
     overview: string,
     image: string
-    apiGenreIds: number[],
+    genres: Genre[],
     apiId: number,
     kind: string
 }
