@@ -8,9 +8,11 @@
             [matAutocomplete]="auto">
         <mat-autocomplete #auto='matAutocomplete' (optionSelected)="selectedOptions($event.option)">
             @for (option of options; track option) {
-                <mat-option [value]="option">{{option.title}}</mat-option>
+                <mat-option [value]="option">{{option.title}} | {{option.releaseYear}}</mat-option>
             }
         </mat-autocomplete>
+
+
     </mat-form-field>
     @if(showForm){<mat-accordion>
         <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
@@ -29,20 +31,23 @@
         <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>Over View:</mat-panel-title>
-                <mat-panel-description>{{newEnrtry.overview}}</mat-panel-description>
+                <mat-panel-description>{{descriptionDisplay(newEnrtry.overview)}}</mat-panel-description>
                 <mat-icon>edit</mat-icon>
             </mat-expansion-panel-header>
             
-            <mat-form-field>
-                <mat-label>Title</mat-label>
-                <input matInput [(ngModel)]="newEnrtry.overview" name="overview">
+            <mat-form-field style="display: block;">
+                <mat-label>Over View...</mat-label>
+                <textarea matInput 
+                        [(ngModel)]="newEnrtry.overview" 
+                        name="overview"
+                        style="overflow-y: scroll;"></textarea>
             </mat-form-field>
         </mat-expansion-panel>
         
         <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>Genres:</mat-panel-title>
-                <mat-panel-description>{{newEnrtry.title}}</mat-panel-description>
+                <mat-panel-description>{{displayGenres(newEnrtry.genres).toString()}}</mat-panel-description>
                 <mat-icon (click)="loadGenreList(newEnrtry.kind)">edit</mat-icon>
             </mat-expansion-panel-header>
             
@@ -58,13 +63,17 @@
                         <button matChipRemove [attr.aria-label]="'remove ' + genre.name"><mat-icon>cancel</mat-icon></button>
                         </mat-chip-row>
                     }
-                    <input placeholder="Another Genre..."
+                    <input #genreInput
+                        [formControl]="genreControl" 
+                        placeholder="Another Genre..."
                         [matChipInputFor]="genreGrid"
                         [matAutocomplete]="auto"
                         [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                         [matChipInputAddOnBlur]="addOnBlur"               
                     />
-                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="updateGenreList('add', {name:$event.option.value, id:0}, $event)">
+                    <mat-autocomplete #auto="matAutocomplete" 
+                    (optionSelected)="updateGenreList('add', {name:$event.option.value, id:0}, $event)"
+                    style="overflow: visible;">
                         @for (genre of genreList; track $index) {
                             <mat-option [value]="genre.name">{{genre.name}}</mat-option>
                         }
@@ -87,7 +96,11 @@
             </mat-chip-listbox>
         </mat-expansion-panel>
     </mat-accordion>
+
+    <button style="display: inline;" mat-raised-button color="primary" (click)="saveEntry()">Save</button>
+    <button style="display: inline; color: black;" mat-stroked-button (click)="clearForm()">Clear</button>
     } @else {
         <p>Please search for Blu-ray details above.</p>
     }
+    
 </form>

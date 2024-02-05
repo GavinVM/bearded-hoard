@@ -6,6 +6,8 @@ import { Entry } from '../model/entry.model';
 import { ISearchOptions } from '../model/searchOptions.model';
 import { Genre } from '../model/genre.model';
 import { group } from '@angular/animations';
+import { startWith } from 'rxjs';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-add-entries',
@@ -14,6 +16,7 @@ import { group } from '@angular/animations';
 })
 export class AddEntriesComponent implements OnInit {
   searchField!: FormControl;
+  genreControl!: FormControl;
   newEnrtry!: Entry;
   results!: any;
   options!: ISearchOptions[];
@@ -21,10 +24,12 @@ export class AddEntriesComponent implements OnInit {
   showForm!: boolean;
   addOnBlur = true;
   step!: number;
+  entries!: Entry[];
 
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  constructor(private appDataService: AppDataService) {
+  constructor(private appDataService: AppDataService,
+              private snackBar: MatSnackBar) {
     this.searchField = new FormControl('');
 
     this.newEnrtry = {
@@ -49,7 +54,8 @@ export class AddEntriesComponent implements OnInit {
               return {
                 title: result.media_type == 'tv'? result.name : result.title,
                 id: result.id,
-                mediaType: result.media_type
+                mediaType: result.media_type,
+                releaseYear: new Date(result.media_type == 'tv'? result.first_air_date : result.release_date).getFullYear().toString()
               };
             });
             console.debug(`MrTracker.AddEntriesComponent.ngOnInit - next line is options`)
@@ -65,15 +71,21 @@ export class AddEntriesComponent implements OnInit {
         this.options = [];
       }
     });
+
+    this.genreControl?.valueChanges?.pipe()
+
+    this.entries = [];
   }
 
   selectedOptions(event: any) {
     console.info(`MrTracker.AddEntriesComponent.selectedOtions - new line is the event object`);
     console.debug(event.value)
     let selection: ISearchOptions = event.value
-    this.searchField.setValue(selection.title)
+    this.searchField.setValue(`${selection.title} | ${selection.releaseYear}`)
     let details = selection.mediaType === 'tv'? this.appDataService.geTvDetailsById(selection.id) : this.appDataService.getMovieDetailsById(selection.id);
     
+    console.debug(details)
+
     details.subscribe({
       next: (details: any) => {
           this.newEnrtry = {
@@ -82,7 +94,7 @@ export class AddEntriesComponent implements OnInit {
             image: details.poster_path,
             genres: details.genres,
             apiId: details.id,
-            kind: details.media_type,
+            kind: selection.mediaType,
           };
         console.debug(this.newEnrtry);
         this.showForm = true;
@@ -97,6 +109,10 @@ export class AddEntriesComponent implements OnInit {
     this.step = stepId;
   }
 
+  descriptionDisplay(description: string){
+    return description.length > 50? `${description.substring(0,(description.indexOf(' ', 50)))}...` : description
+  }
+
   loadGenreList(mediaType:string){
     let list = mediaType === 'tv'? this.appDataService.getTvGenreList() : this.appDataService.getMovieGenreList();
     console.debug(list)
@@ -105,7 +121,7 @@ export class AddEntriesComponent implements OnInit {
         console.debug(genreListMaster)
         this.genreList = genreListMaster.genre
       },
-      error: (error) => {
+    error: (error) => {
         console.error(error)
       }
     })
@@ -128,6 +144,34 @@ export class AddEntriesComponent implements OnInit {
     } else if(action === 'remove'){
       this.newEnrtry.genres = this.newEnrtry.genres.filter(genre => genre.id != genreEntry.id);
     } 
+  }
+
+  displayGenres(genres: Genre[]){
+    return genres.map(val => val.name)
+  }
+
+  saveEntry(){
+    console.debug(`clear form clicked`)
+    this.entries.push(this.newEnrtry);
+    let title: string = this.newEnrtry.title;
+    this.clearForm();
+    this.snackBar.open(`${title} has been Saved`, 'close' , {duration: 3000})
+    console.debug(this.entries)
+  }
+
+  clearForm(){
+    console.debug(`clear form clicked`)
+    this.newEnrtry = {
+      title: '',
+      overview: '',
+      image: '',
+      genres: [],
+      apiId: 0,
+      kind: '',
+    };
+
+    this.searchField.setValue('')
+    this.showForm = false;
   }
 
 }
