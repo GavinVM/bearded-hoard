@@ -11,7 +11,20 @@
 </mat-grid-list>
 <ag-grid-angular
     class="ag-theme-alpine-dark"
+    [rowSelection]="'single'"
     [rowData]="rowData"
     [columnDefs]="columnDefs"
     [domLayout]="'print'"
+    (selectionChanged)="viewDetails($event)"
 ></ag-grid-angular>
+@if (isDetailsVisable) {
+    <mat-card style="width: 400px;">
+        <mat-card-header>
+            <div mat-card-avatar style="background-size: cover;"><img src="{{typeLogo('bluray')}}"/></div>
+            <mat-card-title>{{details.title}}</mat-card-title>
+            <span class="material-symbols-outlined" (click)="closeDetails()">close</span>
+        </mat-card-header>
+        <img mat-card-image [src]="details.image"/>
+        <mat-card-content>{{details.overview}}</mat-card-content>
+    </mat-card>
+}

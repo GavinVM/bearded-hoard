@@ -17,6 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatCardModule } from '@angular/material/card'
 import { AddEntriesComponent } from './add-entries/add-entries.components';
 import { EditEntriesComponent } from './edit-entries/edit-entries.component';
 import { ViewEntriesComponent } from './view-entries/view-entries.component';
@@ -49,6 +50,7 @@ import { HttpClientModule } from '@angular/common/http';
     MatAutocompleteModule,
     MatExpansionModule,
     MatChipsModule,
+    MatCardModule,
     ReactiveFormsModule,
     AsyncPipe,
   ],
