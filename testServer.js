@@ -18,31 +18,55 @@ app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
 //getting all entries
-app.get(apiUrl + "entries", function (req, res) {
-  res.send(JSON.parse(entires));
+app.get(apiUrl + "file/return", function (req, res) {
+  let entiresFileLocation = `${__dirname}\\entries\\${req.query.filePath}\\${req.query.fileName}`
+
+  if(!fs.existsSync(entiresFileLocation)) res.send({
+    status: 404,
+    statusText: `File ${entiresFileLocation} does not exist`
+  })
+
+  try{
+    const data = fs.readFileSync(entiresFileLocation, 'utf8')
+    res.send({
+      status: 200,
+      statusText: 'Retrieval successful',
+      body: data
+    })
+  } catch(error) {
+  
+    res.send({
+      status: 500,
+      statusText: `Issue retrieving ${entiresFileLocation}`
+    })
+  }
+
 });
+
+app.post(apiUrl+"file/save", (req, res) => {
+  let savingLocation = `${__dirname}\\${req.body.filePath}`
+
+  if(!fs.existsSync(savingLocation)) res.send({
+    status: 404,
+    statusText: `Save location ${savingLocation} does not exist`
+  })
+
+  fs.writeFileSync(`${savingLocation}\\${req.body.fileName}`, req.body.content, err => {
+    res.send({
+      status: 500,
+      statusText: `Error while saving: ${err}`
+    })
+  })
+
+  res.send({
+    status: 200,
+    statusText: 'File save successfully'
+  })
+})
 
 var server = app.listen(8081, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log("Example app listening at http://%s:%s", host, port);
+  console.log(`Example app listening at http://${host}:${port}`);
 });
-
-var entires = `[
-        {
-            "title": "title1",
-            "type": "bluray",
-            "certificate": "18"
-        },
-        {
-            "title": "title2",
-            "type": "bluray",
-            "certificate": "15"
-        },
-        {
-            "title": "title3",
-            "type": "4k",
-            "certificate": "pg"
-        }
-    ]`;

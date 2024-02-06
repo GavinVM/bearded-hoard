@@ -1,16 +1,18 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
-import { ENTRIES_MOCK } from 'src/mock-data/entries-mock.data'
 import { Genre } from '../model/genre.model';
+import { Entry } from '../model/entry.model';
+import { AppFileService } from './app-file.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppDataService {
   tmdbHeaders: HttpHeaders;
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private fileService: AppFileService) {
     this.tmdbHeaders = new HttpHeaders({
       Authorization: `Bearer ${environment.accessTokenAuth}`,
       'accept': 'application/json'
@@ -18,7 +20,7 @@ export class AppDataService {
   }
 
   public getEntries() {
-    return this.http.get(environment.entriesurl)
+    return this.fileService.getFile('mainUser', 'collection.txt');
   }
 
   public getSearchResults(searchCriteria: string, kind?: string){

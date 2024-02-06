@@ -1,7 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, Output, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AppDataService } from '../services/appData.service';
+import { Entry } from '../model/entry.model';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-view-entries',
@@ -15,19 +17,16 @@ export class ViewEntriesComponent {
   columnDefs: ColDef[] = [
     { field: 'title' },
     { field: 'type' },
-    { field: 'certificate' },
+    { field: 'overview', valueFormatter: param => this.describeFormat(param?.value)  }
   ];
 
   constructor(private appDataService: AppDataService) {
-    this.appDataService.getEntries().subscribe({
-      next: (entries) => {
-        console.debug(entries);
-        this.rowData = entries;
-      },
-      error: (error) => {
-        console.error('returning entries failed, message to follow');
-        console.error(error);
-      },
+    this.appDataService.getEntries().subscribe((response: HttpResponse<any>) => {
+      if(response.status != 200){
+        console.error(`Response status is ${response.status}, due to ${response.statusText}`);
+      } else {
+        this.rowData = JSON.parse(response.body);
+      }
     });
   }
 
@@ -37,5 +36,9 @@ export class ViewEntriesComponent {
 
   public switchView(viewType: string): void {
     console.log(viewType);
+  }
+
+  describeFormat(description:string){
+    return description.length > 50? `${description.substring(0,(description.indexOf(' ', 50)))}...` : description
   }
 }
