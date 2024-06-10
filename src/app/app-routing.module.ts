@@ -1,17 +1,16 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { AddEntriesComponent } from './add-entries/add-entries.components';
-import { EditEntriesComponent } from './edit-entries/edit-entries.component';
-import { ViewEntriesComponent } from './view-entries/view-entries.component';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  { path: 'add-entries', component: AddEntriesComponent },
-  { path: 'edit-entries', component: EditEntriesComponent },
-  { path: 'view-entries', component: ViewEntriesComponent },
+  {
+    path: '',
+    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  }
 ];
-
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
+  imports: [
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+  ],
+  exports: [RouterModule]
 })
 export class AppRoutingModule {}

@@ -1,0 +1,20 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Mr Tracker
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Add Entry</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar [debounce]="2000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
+    </ion-toolbar>
+  </ion-header>
+
+  <app-explore-container name="Add page"></app-explore-container>
+</ion-content>
