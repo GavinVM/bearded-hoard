@@ -42,3 +42,6 @@ entries
 # System files
 .DS_Store
 Thumbs.db
+
+#custom
+/src/app/manage-entries/
