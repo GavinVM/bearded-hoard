@@ -1,4 +1,4 @@
-<ion-tabs>
+<ion-tabs (ionTabsWillChange)="tabChangeHandler($event)">
 
   <ion-tab-bar slot="botton">
     <ion-tab-button tab="add" href="/tabs/add">

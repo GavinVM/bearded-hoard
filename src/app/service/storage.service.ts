@@ -19,11 +19,12 @@ export class StorageService {
   }
 
   async init(){
-    const storageInitiate = await this.ionStorage.create();
-    this.storage = storageInitiate;
     this.storageResponse = {
       status: false
     };
+    const storageInitiate = await this.ionStorage.create();
+    this.storage = storageInitiate;
+    
   }
 
   async setEntry(key: string, value: any): Promise<StorageResponse>{

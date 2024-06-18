@@ -67,4 +67,8 @@ export class AppDataService {
       )
     )
   }
+
+  getTrackerList(){
+    return this.storageService.getEntry(TRACKER_LIST)
+  }
 }
