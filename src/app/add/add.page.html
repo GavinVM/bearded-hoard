@@ -12,9 +12,36 @@
       <ion-title>Add Entry</ion-title>
     </ion-toolbar>
     <ion-toolbar>
-      <ion-searchbar [debounce]="2000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
+      <ion-searchbar [debounce]="1000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Add page"></app-explore-container>
+  <ion-content>
+    <ion-list [inset]="true">
+
+        @for(option of options; track option){
+          <ion-item>
+            @if(isLoading.get(option.id)){
+              <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
+            } @else {
+              @if(isSaved.get(option.id)){
+                <ion-icon slot="end" name="bookmark" color="success" size="large" (click)="handleSelection(option, false)"></ion-icon>
+              } @else {
+                <ion-icon slot="end" name="bookmark-outline" color="success" size="large" (click)="handleSelection(option, true)"></ion-icon>
+              }
+            }
+            <ion-label>
+              {{option.title}}
+              <ion-note>{{option.releaseYear}}</ion-note>
+            </ion-label>
+          </ion-item>
+        
+        }  
+    </ion-list>
+    <ion-toast
+      [isOpen]="isToast"
+      message="{{toastMessage}}"
+      [duration]="5000"
+    ></ion-toast>
+  </ion-content>
 </ion-content>
