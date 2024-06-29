@@ -19,12 +19,14 @@ export class StorageService {
   }
 
   async init(){
+    console.log(`mrTracker.StorageService.init:: starting`)
     this.storageResponse = {
       status: false
     };
     const storageInitiate = await this.ionStorage.create();
     this.storage = storageInitiate;
-    
+    console.log(`mrTracker.StorageService.init:: empty storage set ${this.storage}`)
+    console.log(`mrTracker.StorageService.init:: finishing`)    
   }
 
   async setEntry(key: string, value: any): Promise<StorageResponse>{
@@ -49,14 +51,18 @@ export class StorageService {
   async getEntry(key: string){
     
     try {
+      console.log(`mrTracker.StorageService.getEntry:: starting`)
+      console.debug(`mrTracker.StorageService.getEntry:: passed in parameters key: ${key}`)
       const item = await this.storage?.get(key);
       this.storageResponse.status = true;
       this.storageResponse.item = item
+      console.debug(`mrTracker.StorageService.getEntry:: got entry for ${key}`, item)
     } catch (error) {
+      console.error(`mrTracker.StorageService.getEntry:: issue getting item for key ${key} `)
       this.storageResponse.status = false;
       this.storageResponse.errorMessage = `entry for id ${key} does not exist`
     }
-
+    console.log(`mrTracker.StorageService.getEntry:: finishing`)
     return this.storageResponse;
      
   }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TabsService } from '../service/tabs.service';
 
 @Component({
   selector: 'app-tabs',
@@ -7,6 +8,10 @@ import { Component } from '@angular/core';
 })
 export class TabsPage {
 
-  constructor() {}
+  constructor(private tabService: TabsService) {}
+
+  tabChangeHandler(event:{tab: string}){
+    this.tabService.triggerTabChangingEmmiter(event.tab);
+  }
 
 }

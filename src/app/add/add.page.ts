@@ -77,9 +77,9 @@ export class AddPage implements OnInit{
 
   async saveEntry(selection: any){
     this.appDataService.saveSelection(selection)
-    .subscribe({
-      next: (response: StorageResponse) => {
-        if(response.status){
+    .then(
+      selectionResponse => {
+        if(selectionResponse.status){
           this.toastMessage = `${selection.title} was saved`
           this.isToast = true;
         } else {
@@ -87,7 +87,7 @@ export class AddPage implements OnInit{
         }
           this.isLoading.set(selection.id, false)
       }
-    })
+    )
 
     
 

@@ -7,11 +7,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">My Tracker</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <app-explore-container name="Tracker page"></app-explore-container>
+  @for(entry of trackerList; track entry.title){
+    <ion-thumbnail>
+      <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
+    </ion-thumbnail>
+  }
 </ion-content>
