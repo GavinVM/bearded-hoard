@@ -76,20 +76,21 @@ export class AddPage implements OnInit{
   }
 
   async saveEntry(selection: any){
+    console.log(`mrTracker.AddPage.saveEntry:: starting`)
     this.appDataService.saveSelection(selection)
     .then(
       selectionResponse => {
+        console.log(`mrTracker.AddPage.saveEntry:: saving complete, checking status`)
         if(selectionResponse.status){
+          console.log(`mrTracker.AddPage.saveEntry:: saved, triggering toast`)
           this.toastMessage = `${selection.title} was saved`
           this.isToast = true;
         } else {
-          console.info('fail')
+          console.error(`mrTracker.AddPage.saveEntry:: fail, error message - ${selectionResponse.errorMessage}`)
         }
+        console.log(`mrTracker.AddPage.saveEntry:: saving process finished, loading complete`)
           this.isLoading.set(selection.id, false)
       }
     )
-
-    
-
   }
 }

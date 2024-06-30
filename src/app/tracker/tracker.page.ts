@@ -14,6 +14,8 @@ export class TrackerPage implements OnInit{
 
   isLoading!: boolean;
   isWaitingForStorage!: boolean;
+  isGrid!: boolean;
+  isReorder!: boolean;
   trackerList!: Entry[];
   imagePreFix!: string;
 
@@ -24,6 +26,8 @@ export class TrackerPage implements OnInit{
     console.info(`mrTracker.TrackerPage.ngOnInit:: starting`)
     this.isLoading = true;
     this.isWaitingForStorage = false;
+    this.isGrid = true;
+    this.isReorder = false;
     this.imagePreFix = environment.tmdbImageBase;
     this.tabService.tabChangingEmiter.subscribe(tab => this.activeTabReload(tab))
     this.loadTrackerList();
@@ -69,6 +73,16 @@ export class TrackerPage implements OnInit{
       }
       
     })
+  }
+
+  toggleGridListView(): boolean {
+    console.info(`mrTracker.TrackerPage.toggleGridListView:: flipping isGrid`)
+    return this.isGrid = !this.isGrid;
+  }
+
+  formatDetail(entry: Entry): string{
+    let detailLength = entry.title.length > 15 ? 15 : 20; 
+    return entry.overview.substring(0, entry.overview.indexOf(' ', detailLength))
   }
 
   

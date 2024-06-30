@@ -62,7 +62,7 @@ export class AppDataService {
     
     await this.storageService.getEntry(TRACKER_LIST).then( trackerList => {
       console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: Starting`)
-      if(!trackerList.status){
+      if(!trackerList.status && !trackerList.errorMessage?.includes("empty")){
         console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: failed`)
         savingResponce.errorMessage = `issue saving the tracker item, passed error message: \n\t\t\t${trackerList.errorMessage}`
         console.error(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: error message passed back from storage - \n\t\t${trackerList.errorMessage}`)
@@ -85,6 +85,7 @@ export class AppDataService {
                 mediaType: selection.mediaType
               }
             )
+            console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: list updated`, tempList)
             return this.storageService.setEntry(
               TRACKER_LIST,
               tempList

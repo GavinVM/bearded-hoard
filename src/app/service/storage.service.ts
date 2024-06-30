@@ -65,7 +65,7 @@ export class StorageService {
       const length = await this.ionStorage.length()
       console.debug(`mrTracker.StorageService.getEntry:: storage lenth is ${length}`)
       if(length == 0){
-        this.storageResponse.errorMessage = 'no entry for that key'
+        this.storageResponse.errorMessage = 'empty'
       } else {
         const item = await this.ionStorage.get(key);
         this.storageResponse.status = true;
