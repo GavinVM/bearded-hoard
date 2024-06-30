@@ -13,9 +13,13 @@ const TRACKER_LIST = 'trackerList';
 })
 export class AppDataService {
 
+  isStorageReady:boolean = false;
   tmdbHeaders: HttpHeaders;
+
   constructor(private http: HttpClient,
               private storageService: StorageService) {
+
+    this.storageService.storageReadyEmitter.subscribe((status: boolean) => this.isStorageReady = status)
     this.tmdbHeaders = new HttpHeaders({
       Authorization: `Bearer ${environment.accessTokenAuth}`,
       'accept': 'application/json'
@@ -71,18 +75,19 @@ export class AppDataService {
         details.pipe(
           mergeMap((detail:any) => {
             console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: triggered`)
+            tempList.push(
+              {
+                title: detail.title,
+                overview: detail.overview,
+                image: detail.poster_path,
+                genres: detail.genres,
+                apiId: detail.id,
+                mediaType: selection.mediaType
+              }
+            )
             return this.storageService.setEntry(
               TRACKER_LIST,
-              tempList.push(
-                {
-                  title: detail.title,
-                  overview: detail.overview,
-                  image: detail.poster_path,
-                  genres: detail.genres,
-                  apiId: detail.id,
-                  mediaType: selection.mediaType
-                }
-              )
+              tempList
             )
           })
         )
@@ -110,6 +115,6 @@ export class AppDataService {
   }
 
   getTrackerList(){
-    return this.storageService.getEntry(TRACKER_LIST)
+    return this.isStorageReady ? this.storageService.getEntry(TRACKER_LIST) : new Promise<StorageResponse>(resolve => resolve({status: false}))
   }
 }
