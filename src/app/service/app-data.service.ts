@@ -115,6 +115,10 @@ export class AppDataService {
     return savingResponce;
   }
 
+  updateTrackerList(tracketList: Entry[]): Promise<StorageResponse>{
+    return this.storageService.setEntry(TRACKER_LIST, tracketList)
+  }
+
   getTrackerList(){
     return this.isStorageReady ? this.storageService.getEntry(TRACKER_LIST) : new Promise<StorageResponse>(resolve => resolve({status: false}))
   }
