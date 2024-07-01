@@ -24,10 +24,14 @@
             @if(isLoading.get(option.id)){
               <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
             } @else {
-              @if(isSaved.get(option.id)){
-                <ion-icon slot="end" name="bookmark" color="success" size="large" (click)="handleSelection(option, false)"></ion-icon>
+              @if(isSaved.get(option.id)){ 
+                <ion-icon slot="end" src="/assets/icon/blu-ray-outline.svg" color="success" size="large" (click)="handleSelection(option, false, 'bluray')"></ion-icon>
+                <ion-icon slot="end" src="/assets/icon/ultra-hd-outline.svg" color="success" size="large" (click)="handleSelection(option, false, '4k')"></ion-icon>
+                <!-- <ion-icon slot="end" name="bookmark" color="success" size="large" (click)="handleSelection(option, false)"></ion-icon> -->
               } @else {
-                <ion-icon slot="end" name="bookmark-outline" color="success" size="large" (click)="handleSelection(option, true)"></ion-icon>
+                <ion-icon slot="end" src="/assets/icon/blu-ray-outline.svg" color="success" size="large" (click)="handleSelection(option, false, 'bluray')"></ion-icon>
+                <ion-icon slot="end" src="/assets/icon/ultra-hd-outline.svg" color="success" size="large" (click)="handleSelection(option, false, '4k')"></ion-icon>
+                <!-- <ion-icon slot="end" name="bookmark-outline" color="success" size="large" (click)="handleSelection(option, true, 'bluray')"></ion-icon> -->
               }
             }
             <ion-label>

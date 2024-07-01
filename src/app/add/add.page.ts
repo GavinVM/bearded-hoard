@@ -66,7 +66,7 @@ export class AddPage implements OnInit{
     }
   }
 
-  handleSelection( selection:any, saveState: boolean){
+  handleSelection( selection:any, saveState: boolean, mediaType: string){
     console.log(selection)
     this.isLoading.set(selection.id, true)
     this.isSaved.set(selection.id , saveState);
