@@ -4,5 +4,5 @@ export interface Entry {
     image: string
     genres: string
     apiId: string
-    mediaType: string
+    mediaType: string[]
 }

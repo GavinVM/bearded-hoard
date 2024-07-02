@@ -20,7 +20,8 @@ export class AddPage implements OnInit{
   results!: any[];
   options!: any[];
 
-  isSaved!: Map<string, boolean>;
+  isSavedBluray!: Map<string, boolean>;
+  isSaved4k!: Map<string, boolean>;
   isLoading!: Map<string, boolean>;
 
   constructor(private appDataService: AppDataService) {}
@@ -28,9 +29,11 @@ export class AddPage implements OnInit{
   ngOnInit(): void {
     this.results = [];
     this.options = [];
-    this.isSaved = new Map();
+    this.isSavedBluray = new Map();
+    this.isSaved4k = new Map();
     this.isLoading = new Map();
     this.isToast = false;
+    this.appDataService.savedEventEmittter.subscribe(response => this.handleSavingEvent(response));
   }
   
   getResults(event:any){
@@ -40,10 +43,12 @@ export class AddPage implements OnInit{
         next: (data: any) => {
           console.debug(data);
           this.results = data.results;
-          this.isSaved = new Map();
+          this.isSavedBluray = new Map();
+          this.isSaved4k = new Map();
           this.isLoading = new Map();
           this.options = data.results.filter((result:any) => result.media_type != 'person').map((result: any) => {
-            this.isSaved.set(result.id, false);
+            this.isSavedBluray.set(result.id, false);
+            this.isSaved4k.set(result.id, false);
             this.isLoading.set(result.id, false);
             return {
               title: result.media_type == 'tv'? result.name : result.title,
@@ -69,28 +74,32 @@ export class AddPage implements OnInit{
   handleSelection( selection:any, saveState: boolean, mediaType: string){
     console.log(selection)
     this.isLoading.set(selection.id, true)
-    this.isSaved.set(selection.id , saveState);
+    if(mediaType == '4k'){
+      this.isSaved4k.set(selection.id, saveState)
+    } else {
+      this.isSavedBluray.set(selection.id, saveState)
+    }
     if(saveState){
-      this.saveEntry(selection)
+      this.saveEntry(selection, mediaType)
     }
   }
 
-  async saveEntry(selection: any){
+  saveEntry(selection: any, media_type:string){
     console.log(`mrTracker.AddPage.saveEntry:: starting`)
-    this.appDataService.saveSelection(selection)
-    .then(
-      selectionResponse => {
-        console.log(`mrTracker.AddPage.saveEntry:: saving complete, checking status`)
-        if(selectionResponse.status){
-          console.log(`mrTracker.AddPage.saveEntry:: saved, triggering toast`)
-          this.toastMessage = `${selection.title} was saved`
-          this.isToast = true;
-        } else {
-          console.error(`mrTracker.AddPage.saveEntry:: fail, error message - ${selectionResponse.errorMessage}`)
-        }
-        console.log(`mrTracker.AddPage.saveEntry:: saving process finished, loading complete`)
-          this.isLoading.set(selection.id, false)
-      }
-    )
+    this.appDataService.saveSelection(selection, media_type)
+  }
+
+  handleSavingEvent(selectionResponse: StorageResponse){
+    console.log(`mrTracker.AddPage.saveEntry:: response passed back`, selectionResponse)
+    console.log(`mrTracker.AddPage.saveEntry:: saving complete, checking status`)
+    if(selectionResponse.status){
+      console.log(`mrTracker.AddPage.saveEntry:: saved, triggering toast`)
+      this.toastMessage = `${selectionResponse.item.title} was saved in ${selectionResponse.item.mediaType[selectionResponse.item.mediaType.length > 1 ? 1 : 0]}`
+      this.isToast = true;
+    } else {
+      console.error(`mrTracker.AddPage.saveEntry:: fail, error message - ${selectionResponse.errorMessage}`)
+    }
+    console.log(`mrTracker.AddPage.saveEntry:: saving process finished, loading complete`)
+      this.isLoading.set(selectionResponse.item.id, false)
   }
 }
