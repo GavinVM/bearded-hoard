@@ -12,7 +12,7 @@
       <ion-title>Add Entry</ion-title>
     </ion-toolbar>
     <ion-toolbar>
-      <ion-searchbar [debounce]="1000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
+      <ion-searchbar #searchBarTextBox [debounce]="1000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
     </ion-toolbar>
   </ion-header>
 
@@ -31,7 +31,7 @@
 
             <ion-item-options slide="end">
               <ion-item-option color="primary">
-                @if(isLoading.get(option.id)){
+                @if(isLoadingBluray.get(option.id)){
                   <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
                 } @else{
                   @if(isSavedBluray.get(option.id)){
@@ -42,7 +42,7 @@
                 }                
               </ion-item-option>
               <ion-item-option color="medium">
-                @if(isLoading.get(option.id)){
+                @if(isLoading4k.get(option.id)){
                   <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
                 } @else{
                   @if(isSaved4k.get(option.id)){

@@ -33,8 +33,8 @@
             <ion-card>
               <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
               <div class="mediaIcons">
-                @for(type of entry.mediaType; track $index){
-                  <img [src]="getMediaTypeIcon(type)" class="mediaIcon"/>
+                @for(format of entry.format; track $index){
+                  <img [src]="getMediaTypeIcon(format)" class="mediaIcon"/>
                 }
               </div>
             </ion-card>
