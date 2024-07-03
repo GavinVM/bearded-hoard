@@ -10,6 +10,8 @@ const GRID: string = 'grid';
 const REORDER_TOGGLED: string = 'filled';
 const REORDER_PENDING: string = '';
 
+
+
 @Component({
   selector: 'app-tracker',
   templateUrl: 'tracker.page.html',
@@ -143,6 +145,17 @@ export class TrackerPage implements OnInit{
     console.info(`mrTracker.TrackerPage.handleReorder:: finishing`)
     // this.trackerList = ev.detail.complete(this.trackerList)
     
+  }
+
+  getMediaTypeIcon(mediaType:string): string{
+    switch(mediaType){
+      case 'bluray':
+        return "/assets/icon/blu-ray.svg";
+      case '4k':
+        return '/assets/icon/ultra-hd.svg';
+      default:
+        return '';
+    }
   }
 
 }

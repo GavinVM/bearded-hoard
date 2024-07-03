@@ -41,7 +41,7 @@ export class StorageService {
   async setEntry(key: string, value: any): Promise<StorageResponse>{
       try {
         console.log(`mrTracker.StorageService.setEntry:: starting`)
-        console.debug(`mrTracker.StorageService.setEntry:: passed in parameters key: ${key}, value: ${value}`)
+        console.debug(`mrTracker.StorageService.setEntry:: passed in parameters key: ${key}, value: `, value)
         await this.ionStorage.set(key, value)
         this.storageResponse.status = true;
         console.info(`mrTracker.StorageService.setEntry:: item saved for key ${key}`)

@@ -5,4 +5,5 @@ export interface Entry {
     genres: string
     apiId: string
     mediaType: string
+    format: string[]
 }

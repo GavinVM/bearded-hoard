@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { mergeMap, switchMap} from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -15,6 +15,8 @@ export class AppDataService {
 
   isStorageReady:boolean = false;
   tmdbHeaders: HttpHeaders;
+
+  savedEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
 
   constructor(private http: HttpClient,
               private storageService: StorageService) {
@@ -53,14 +55,14 @@ export class AppDataService {
       })
   }
 
-  async saveSelection(selection: any): Promise<StorageResponse>{
+  saveSelection(selection: any){
     console.info(`mrTracker.AppDataService.saveSelection:: Starting`)
     let details = selection.mediaType === 'tv'? this.geTvDetailsById(selection.id) : this.getMovieDetailsById(selection.id);
     let savingResponce: StorageResponse = {status: false};
     console.debug(`mrTracker.AppDataService.saveSelection:: setting details call and reponse object`)
     
     
-    await this.storageService.getEntry(TRACKER_LIST).then( trackerList => {
+    this.storageService.getEntry(TRACKER_LIST).then( trackerList => {
       console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: Starting`)
       if(!trackerList.status && !trackerList.errorMessage?.includes("empty")){
         console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: failed`)
@@ -70,21 +72,44 @@ export class AppDataService {
         console.debug('mrTracker.AppDataService.saveSelection.storageService.getEntry:: successful and passed back ->', trackerList)
         let tempList: Entry[] = trackerList.status ? trackerList.item != null ? trackerList.item : [] : [];
         console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: getting list for saving, current state is`, tempList)
-        // console.debug(tempList)
+        let updateEntry: Entry;
+        let isUpdate: boolean = false;
+        let updateIndex: number;
+
+        if(tempList.length > 0){
+          let tempEntry = tempList.filter((entry: Entry, index: number) => {
+            if(entry.apiId == selection.id){
+              updateIndex = index;
+              return true
+            } else {
+              return false
+            }
+          })
+          if(tempEntry.length > 0){
+            updateEntry = tempEntry[0];
+            updateEntry.format.push(selection.format)
+            isUpdate = true;
+          }
+        }
 
         details.pipe(
           mergeMap((detail:any) => {
             console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: triggered`)
-            tempList.push(
-              {
-                title: detail.title,
-                overview: detail.overview,
-                image: detail.poster_path,
-                genres: detail.genres,
-                apiId: detail.id,
-                mediaType: selection.mediaType
-              }
-            )
+            if(isUpdate){
+              tempList[updateIndex] = updateEntry
+            } else {
+              tempList.push(
+                {
+                  title:  selection.mediaType === 'tv'? detail.name : detail.title,
+                  overview: detail.overview,
+                  image: detail.poster_path,
+                  genres: detail.genres,
+                  apiId: detail.id,
+                  mediaType: selection.mediaType,
+                  format: [selection.format]
+                }
+              )
+            }
             console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: list updated`, tempList)
             return this.storageService.setEntry(
               TRACKER_LIST,
@@ -98,21 +123,22 @@ export class AppDataService {
               if(response.status){
                 console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: successful`)
                 savingResponce.status = true;
-                savingResponce.item = response.item
+                savingResponce.item = isUpdate ? updateEntry : tempList[tempList.length-1]
                 console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: item saved`, response.item)
               } else {
                 savingResponce.errorMessage = `issue saving the tracker item, passed error message: \n\t\t\t${response.errorMessage}`
               }
               console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry.setEntry:: complete`)
+              this.savedEventEmittter.emit(savingResponce);
             }
           }
         )
       }
-
       console.info(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: finishing`)
+      
+      
     })
-    console.info(`mrTracker.AppDataService.saveSelection:: finishing`)
-    return savingResponce;
+    
   }
 
   updateTrackerList(tracketList: Entry[]): Promise<StorageResponse>{
