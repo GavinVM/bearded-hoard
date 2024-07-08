@@ -46,11 +46,6 @@
   @else {
     <ion-toolbar>
       <ion-buttons slot="end">
-        <!-- @if(isReorder){
-          <ion-text>
-            <sub>Click To Save -></sub>
-          </ion-text>
-        } -->
         <ion-button id="reorderButton"(click)="toggleReorder()" [type]="reorderButtonState">
           @if(isReorder){
             <ion-icon name="save-outline"></ion-icon>
