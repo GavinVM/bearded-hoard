@@ -107,7 +107,8 @@ export class AppDataService {
                   genres: detail.genres,
                   apiId: detail.id,
                   mediaType: selection.mediaType,
-                  format: [selection.format]
+                  format: [selection.format],
+                  season: selection.season
                 }
               )
             }

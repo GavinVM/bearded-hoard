@@ -6,6 +6,7 @@ import { Entry } from '../model/entry.model';
 import { StorageResponse } from '../model/storage-response.model';
 import { TabsService } from '../service/tabs.service';
 import { IonSearchbar } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -18,6 +19,10 @@ export class AddPage implements OnInit{
 
   toastMessage!: string;
   currentFormat!: string;
+  icon4KOutline!: string;
+  icon4K!: string;
+  iconBlurayOutline!: string;
+  iconBluray!: string;
   isToast!: boolean;
   isSeasonDetailsRunning!: boolean;
 
@@ -45,6 +50,10 @@ export class AddPage implements OnInit{
     this.isLoadingBluray = new Map();
     this.isLoading4k = new Map();
     this.isToast = false;
+    this.icon4KOutline = environment.icons('4k', true);
+    this.icon4K = environment.icons('4k');
+    this.iconBlurayOutline = environment.icons('blu-ray', true);
+    this.iconBluray = environment.icons('blu-ray');
     this.isSeasonDetailsRunning = false;
     this.appDataService.savedEventEmittter.subscribe(response => this.handleSavingEvent(response));
     this.tabService.tabChangingEmiter.subscribe(tab => this.tabChange(tab));
@@ -112,15 +121,17 @@ export class AddPage implements OnInit{
     let tempOptions: any[] = [];
     result.seasons.forEach((season:any) => {
       tempOptions.push({
-        title: `${result.name}: ${season.name}`,
+        title: result.name,
+        season: season.name,
         id: result.id,
-        mediaType: result.media_type,
+        mediaType: 'tv',
         releaseYear: new Date(season.air_date).getFullYear().toString()
       })
     });
 
     tempOptions.push({
-      title: `${result.name}: Box Set`,
+      title: result.name,
+      season: 'Box Set',
       id: result.id,
       mediaType: result.media_type,
       releaseYear: new Date(result.first_air_date).getFullYear().toString()

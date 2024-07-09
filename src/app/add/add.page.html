@@ -24,7 +24,7 @@
             <ion-item>
               <ion-label>
                 {{option.title}}
-                <ion-note>{{option.releaseYear}}</ion-note>
+                <ion-note>@if(option.mediaType == 'tv'){: {{option.season}}} {{option.releaseYear}}</ion-note>
               </ion-label>
               <ion-icon slot="end" name="chevron-back-outline" colour="medium" size="large" ></ion-icon>
             </ion-item>
@@ -35,9 +35,9 @@
                   <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
                 } @else{
                   @if(isSavedBluray.get(option.id)){
-                      <ion-icon slot="icon-only" src="/assets/icon/blu-ray.svg"  size="large" (click)="handleSelection(option, false, 'bluray')"></ion-icon>
+                      <ion-icon slot="icon-only" [src]="iconBluray"  size="large" (click)="handleSelection(option, false, 'bluray')"></ion-icon>
                     } @else {
-                      <ion-icon slot="icon-only" src="/assets/icon/blu-ray-outline.svg"  size="large" (click)="handleSelection(option, true, 'bluray')"></ion-icon>
+                      <ion-icon slot="icon-only" [src]="iconBlurayOutline"  size="large" (click)="handleSelection(option, true, 'bluray')"></ion-icon>
                     }
                 }                
               </ion-item-option>
@@ -46,9 +46,9 @@
                   <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
                 } @else{
                   @if(isSaved4k.get(option.id)){
-                      <ion-icon slot="icon-only" src="/assets/icon/ultra-hd.svg" size="large" (click)="handleSelection(option, false, '4k')"></ion-icon>
+                      <ion-icon slot="icon-only" [src]="icon4K" size="large" (click)="handleSelection(option, false, '4k')"></ion-icon>
                     } @else {
-                      <ion-icon slot="icon-only" src="/assets/icon/ultra-hd-outline.svg" size="large" (click)="handleSelection(option, true, '4k')"></ion-icon>
+                      <ion-icon slot="icon-only" [src]="icon4KOutline" size="large" (click)="handleSelection(option, true, '4k')"></ion-icon>
                     }
                 }
               </ion-item-option>
@@ -63,3 +63,5 @@
     ></ion-toast>
   </ion-content>
 </ion-content>
+
+<!-- <div>Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a>is licensed by CC BY 4.0</div> -->

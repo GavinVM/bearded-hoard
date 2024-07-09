@@ -37,6 +37,9 @@
                   <img [src]="getMediaTypeIcon(format)" class="mediaIcon"/>
                 }
               </div>
+              @if(entry.mediaType == 'tv'){
+                <span class="seasonTitle mediaIcon">{{entry.season}}</span>
+              }
             </ion-card>
           </ion-col>
         }
@@ -62,7 +65,7 @@
         @for(entry of trackerList; track entry.title){
           <ion-item>
             <ion-label>
-              {{entry.title}}
+              {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
               <ion-note>  {{formatDetail(entry)}}...</ion-note>
             </ion-label>
             <ion-reorder slot="end"></ion-reorder>
