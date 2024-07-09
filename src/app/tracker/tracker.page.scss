@@ -14,3 +14,14 @@ ion-grid{
   background-color: var(--ion-background-color-step-250);
   opacity: 0.8;
 }
+
+.seasonTitle{
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  color: white;
+  width: 100%;
+  font-size: 5vw;
+  font-weight: 600;
+  opacity: 0.45;
+}

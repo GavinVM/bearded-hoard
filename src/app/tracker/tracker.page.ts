@@ -150,9 +150,9 @@ export class TrackerPage implements OnInit{
   getMediaTypeIcon(mediaType:string): string{
     switch(mediaType){
       case 'bluray':
-        return "/assets/icon/blu-ray.svg";
+        return environment.icons('blu-ray');
       case '4k':
-        return '/assets/icon/ultra-hd.svg';
+        return environment.icons('4k');
       default:
         return '';
     }

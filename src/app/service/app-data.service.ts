@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { mergeMap, switchMap} from 'rxjs';
+import { mergeMap, of, switchMap} from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
@@ -39,8 +39,9 @@ export class AppDataService {
         params: { query: searchCriteria}
       });
   }
-  geTvDetailsById(selectionId: string){
-    return this.http.get(
+  geTvDetailsById(selectionId: string, mediaType?: string, apiSearchResults?: any){
+    // console.info('mrTracker.AppDataService.getSearchResults:: passed param - ',selectionId, mediaType, apiSearchResults )
+    return mediaType == 'movie' ? of(apiSearchResults) : this.http.get(
       environment.tvDetailsByIdUrl + selectionId,
       {
         headers: this.tmdbHeaders
@@ -106,7 +107,8 @@ export class AppDataService {
                   genres: detail.genres,
                   apiId: detail.id,
                   mediaType: selection.mediaType,
-                  format: [selection.format]
+                  format: [selection.format],
+                  season: selection.season
                 }
               )
             }
