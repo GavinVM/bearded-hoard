@@ -2,17 +2,17 @@ import { IonicModule } from '@ionic/angular';
 import { NgModule, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AddPage } from './add.page';
+import { CexIntergrationComponent } from './cex-intergration.component';
 
-import { AddPageRoutingModule } from './add-routing.module';
+import { CexIntergrationRoutingModule } from './cex-intergration-routing.module';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    AddPageRoutingModule
+    CexIntergrationRoutingModule
   ],
-  declarations: [AddPage]
+  declarations: [CexIntergrationComponent]
 })
-export class AddPageModule {}
+export class CexIntergrationModule {}

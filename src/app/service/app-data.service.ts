@@ -1,12 +1,16 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { mergeMap, of, switchMap} from 'rxjs';
+import { mergeMap, Observable, of, switchMap} from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
 import { StorageResponse } from '../model/storage-response.model';
 import { Entry } from '../model/entry.model';
+import { CexResults } from '../model/cex-results.model';
+import { CexService } from './cex.service';
+import { CexEntry } from '../model/cex-entry.model';
 
 const TRACKER_LIST = 'trackerList';
+const CEX_LIST = 'cexList';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +21,11 @@ export class AppDataService {
   tmdbHeaders: HttpHeaders;
 
   savedEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
+  cexListReadyEmitter: EventEmitter<CexEntry[]> = new EventEmitter()
 
   constructor(private http: HttpClient,
-              private storageService: StorageService) {
+              private storageService: StorageService,
+              private cexService: CexService) {
 
     this.storageService.storageReadyEmitter.subscribe((status: boolean) => this.isStorageReady = status)
     this.tmdbHeaders = new HttpHeaders({
@@ -148,6 +154,43 @@ export class AppDataService {
   }
 
   getTrackerList(){
-    return this.isStorageReady ? this.storageService.getEntry(TRACKER_LIST) : new Promise<StorageResponse>(resolve => resolve({status: false}))
+    return this.getList(TRACKER_LIST);
   }
+
+  getCexList(){
+    console.info(`mrTracker.AppDataService.getCexList:: Starting`) 
+    this.getList(CEX_LIST).then((storageResponse:StorageResponse) =>{
+      console.info(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
+      if(storageResponse.status){
+        let cexResults: CexResults = storageResponse.item
+        if(this.sessionValid(cexResults.expiry)){
+          this.cexListReadyEmitter.emit(cexResults.cexList)
+        } else {
+          this.cexService.updateList().then((observable: Observable<StorageResponse>) => {
+            return observable.subscribe({
+              next: (response: StorageResponse) => {
+                if(response.status){  
+                  this.cexListReadyEmitter.emit(response.item)
+                } else {
+                  this.cexListReadyEmitter.emit([])
+                }
+              }
+            })
+          })
+        }
+      }
+    });
+  }
+
+  sessionValid(expiry: Date){    
+    return false;
+  }
+
+  getList(list:string){
+    // handle storage not ready here instead of on the component level
+    return this.isStorageReady ? this.storageService.getEntry(list) : new Promise<StorageResponse>(resolve => resolve({status: false}))
+  }
+
+
+
 }

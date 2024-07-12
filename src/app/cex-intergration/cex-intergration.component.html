@@ -1,0 +1,34 @@
+<ion-header [translucent]="false">
+  <ion-toolbar>
+    <ion-title>
+      Mr Tracker
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-title>
+        <img [src]="iconCex" class="cexIcon"/>
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list [inset]="true">
+
+      @for(cexEntry of cexList; track cexEntry){
+        <ion-item>
+          <ion-label>
+            {{cexEntry.description}}
+            <ion-note>{{cexEntry.format}}</ion-note>
+          </ion-label>
+          <ion-badge [color]="cexEntry.cost == 3 ? 'warning' : cexEntry.cost >= 2 && cexEntry.cost < 3 ? 'primary' : 'success'">{{cexEntry.cost | currency: 'GBP'}}</ion-badge>
+          <!-- <ion-icon slot="end" name="chevron-back-outline" colour="medium" size="large" ></ion-icon> -->
+        </ion-item>
+      }
+    </ion-list>
+  </ion-content>
+
+  </ion-content>
