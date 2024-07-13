@@ -21,6 +21,7 @@ export class AppDataService {
   tmdbHeaders: HttpHeaders;
 
   savedEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
+  trackerListEventEmittter: EventEmitter<Entry[]> = new EventEmitter()
   cexListReadyEmitter: EventEmitter<CexEntry[]> = new EventEmitter()
 
   constructor(private http: HttpClient,
@@ -28,6 +29,7 @@ export class AppDataService {
               private cexService: CexService) {
 
     this.storageService.storageReadyEmitter.subscribe((status: boolean) => this.isStorageReady = status)
+    this.cexService.cexListUpdateCompleteEmitter.subscribe(cexResults => this.cexListReadyEmitter.emit(cexResults.cexList))
     this.tmdbHeaders = new HttpHeaders({
       Authorization: `Bearer ${environment.accessTokenAuth}`,
       'accept': 'application/json'
@@ -154,35 +156,55 @@ export class AppDataService {
   }
 
   getTrackerList(){
-    return this.getList(TRACKER_LIST);
-  }
-
-  getCexList(){
-    console.info(`mrTracker.AppDataService.getCexList:: Starting`) 
-    this.getList(CEX_LIST).then((storageResponse:StorageResponse) =>{
-      console.info(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
-      if(storageResponse.status){
-        let cexResults: CexResults = storageResponse.item
-        if(this.sessionValid(cexResults.expiry)){
-          this.cexListReadyEmitter.emit(cexResults.cexList)
+    this.getList(TRACKER_LIST).then((response:StorageResponse) => {
+      if(response.status){
+        console.info(`mrTracker.AppDataService.getTrackerList:: storage ready triggering trackerList event`)
+        this.trackerListEventEmittter.emit(response.item?? [])
+      } else {
+        if(response.errorMessage){
+          console.info('mrTracker.AppDataService.getTrackerList:: list empty, triggering trackerList with empty list')
+          this.trackerListEventEmittter.emit([])
         } else {
-          this.cexService.updateList().then((observable: Observable<StorageResponse>) => {
-            return observable.subscribe({
-              next: (response: StorageResponse) => {
-                if(response.status){  
-                  this.cexListReadyEmitter.emit(response.item)
-                } else {
-                  this.cexListReadyEmitter.emit([])
-                }
-              }
-            })
-          })
+          console.info(`mrTracker.AppDataService.getTrackerList:: storage not ready, retrying in 2 seconds`)
+          setTimeout(() => {
+            this.getTrackerList();
+          }, 2000)
         }
       }
     });
   }
 
-  sessionValid(expiry: Date){    
+  async getCexList(){
+    console.info(`mrTracker.AppDataService.getCexList:: Starting`) 
+    this.getList(CEX_LIST).then((storageResponse:StorageResponse) =>{
+      console.info(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
+      if(storageResponse.status){
+        console.info(`mrTracker.AppDataService.getCexList:: status is ${storageResponse.status}, getting CexResults`) 
+        let cexResults: CexResults = storageResponse.item
+        if(this.sessionValid(cexResults.expiry)){
+          this.cexListReadyEmitter.emit(cexResults.cexList)
+        } else {
+          console.info(`mrTracker.AppDataService.getCexList:: session expired, updating list`)
+           this.cexService.updateList()
+        }
+      } else {
+        if(this.isStorageReady){
+          console.info(`mrTracker.AppDataService.getCexList:: storage is ready updating list`)
+           this.cexService.updateList()
+        } else {
+          console.info(`mrTracker.AppDataService.getCexList:: storage is pending, waiting 2 seconds`)
+          setTimeout(() => {this.getCexList()}, 1000)
+        }
+      }
+    });
+    console.info(`mrTracker.AppDataService.getCexList:: finishing`) 
+  }
+
+  sessionValid(expiry: Date){  
+    let toDate = new Date()
+    
+    console.log(`mrTracker.AppDataService.sessionValid:: expiry and toDate equals ${expiry == toDate}`)
+    console.log(`mrTracker.AppDataService.sessionValid:: expiry and toDate local string equals ${expiry.toLocaleString() == toDate.toLocaleString()}`)
     return false;
   }
 
@@ -190,6 +212,8 @@ export class AppDataService {
     // handle storage not ready here instead of on the component level
     return this.isStorageReady ? this.storageService.getEntry(list) : new Promise<StorageResponse>(resolve => resolve({status: false}))
   }
+
+  
 
 
 

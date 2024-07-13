@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { CexEntry } from '../model/cex-entry.model';
-import { map, mergeMap, of } from 'rxjs';
+import { forkJoin, map, mergeMap, of } from 'rxjs';
 import { StorageService } from './storage.service';
 import { CexResults } from '../model/cex-results.model';
 import { StorageResponse } from '../model/storage-response.model';
@@ -16,6 +16,8 @@ export class CexService {
   cexList!: CexEntry[];
   cexResults!: CexResults;
   existingTitles!: string[];
+
+  cexListUpdateCompleteEmitter: EventEmitter<CexResults> = new EventEmitter();
 
   constructor(private http: HttpClient,
               private storageService: StorageService) { }
@@ -33,51 +35,70 @@ export class CexService {
         this.existingTitles = response.item.map((entry: Entry) => entry.title);
       }
     })
-    console.debug(`mrTracker.CexService.updateList:: got list`)
+    console.debug(`mrTracker.CexService.updateList:: got list`, this.existingTitles)
 
-    return this.getSearchResults().pipe(
+    this.getSearchResults().pipe(
+
       mergeMap((results:any) => {
+        console.debug(`mrTracker.CexService.updateList:: initial query returned`, results)
         let pageNumbers = Array.from(Array(results.nbPages).keys()) 
+        console.debug(`mrTracker.CexService.updateList:: list of pages set to ${results.nbPages}`, pageNumbers)
         let urlPrams = environment.cexDefaultSearchParams;
-        return Promise.all(
-          pageNumbers.map(async (page: number) => {
-            urlPrams.set('page', (page+1).toString());
-            this.getSearchResults(urlPrams).pipe(
-              map((results:any) => {
-                results
-                .filter((hit:any) => !this.existingTitles.includes(hit.bixName.subString(0, hit.boxName.indexOf('('))))
-                .filter((hit:any) => hit.availability.includes("In Stock Online"))
-                .filter((hit:any) => hit.sellPrice < 4)
-              })
-            )
-          })
-        ).then((collectiveResults:any) => {
-          collectiveResults.forEach((hit:any) => {
+        if(results.nbHits > 100) urlPrams.set('hitsPerPage', '100')
+        let requestList: any[] = [];
+        pageNumbers.forEach((page:number) => {
+          console.debug(`mrTracker.CexService.updateList:: updating page to ${page}`)
+          urlPrams.set('page', (page).toString());
+          console.debug(`mrTracker.CexService.updateList:: url params are now`, urlPrams)
+          requestList.push(this.getSearchResults(urlPrams))
+        })
+        return requestList;
+      })
+    )
+    .subscribe((requestList:any) => {
+      forkJoin((requestList)).subscribe((results:any) => {
+        results.forEach((resultSet:any) => {
+          console.debug(`mrTracker.CexService.updateList:: cex returned for page ${resultSet.page}`, resultSet)
+          resultSet.hits
+          // .filter((hit:any) => !this.existingTitles.includes(hit.boxName.substring(0, hit.boxName.indexOf('('))))
+          .filter((hit:any) => hit.availability.includes("In Stock Online"))
+          .filter((hit:any) => hit.sellPrice < 4)
+          .forEach((hit:any) => {
             this.cexList.push({
               cexId: hit.boxId,
               cost: hit.sellPrice,
-              description: hit.boxName,
+              description: hit.boxName.substring(0, hit.boxName.indexOf('(')),
               format: this.convertFormat(hit.categoryFriendlyName)
             })
           })
   
-          this.cexResults.cexList = this.cexList
-  
-          return this.storageService.setEntry('cexList', this.cexResults);
+        this.cexResults.cexList = this.cexList
         })
+  
+        
       })
-    )
-      
-
+        
+    }).add(() => {
+      this.storageService.setEntry('cexList', this.cexResults).then((response: StorageResponse) => {
+        if(response.status){
+          this.cexListUpdateCompleteEmitter.emit(this.cexResults);
+        } else {
+          this.cexListUpdateCompleteEmitter.emit({cexList: [], expiry: new Date})
+        }
+      });
+    })
   }
 
   getSearchResults(searchQuery?: Map<string,string>){
+    
     let cexDefaultSearchParams: Map<string,string> = environment.cexDefaultSearchParams
     let urlPrams: HttpParams = new HttpParams();
     if(searchQuery != undefined)  cexDefaultSearchParams = searchQuery;
 
-    cexDefaultSearchParams.forEach((name:string, value:string) => {
-      urlPrams.set(name, value);
+    console.debug(`mrTracker.CexService.getSearchResults:: starting with url params map`, cexDefaultSearchParams)
+
+    cexDefaultSearchParams.forEach((value:string, name:string) => {
+      urlPrams = urlPrams.set(name, value);
     });
 
     return this.http.get(environment.cexSearchApiBase, {params: urlPrams});
@@ -85,8 +106,9 @@ export class CexService {
   }
 
   convertFormat(cexCategory:string):string{
-    
-    return cexCategory.includes('4k') ? '4k' : 'bluray';
+    console.debug(`mrTracker.CexService.convertFormat:: starting with ${cexCategory}`)
+    console.debug(`mrTracker.CexService.convertFormat:: flow for disection is - split ${cexCategory.split(/\s/).toString()}, includes ${cexCategory.split(/\s/).includes('4k')}, returned ${cexCategory.split(/\s/).includes('4k') ? '4k' : 'bluray'}`)
+    return cexCategory.split(/\s/).indexOf('4K') != -1 ? '4k' : 'Bluray';
   }
 
 
