@@ -1,46 +1,103 @@
-<ion-header [translucent]="false">
-  <ion-toolbar>
-    <ion-title>
-      Mr Tracker
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header [translucent]="true">
+<ion-menu type="push" menuId="filtersMenu" contentId="cexListPage" side="end">
+  <ion-header>
     <ion-toolbar>
       <ion-title>
-        <img [src]="iconCex" class="cexIcon"/>
+        Filters
       </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeFilterMenu()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons> 
     </ion-toolbar>
   </ion-header>
 
   <ion-content>
-    @if(isloading){
-      <ion-loading [isOpen]="isloading" message="Loading Cex Results..."></ion-loading>
-    } 
-    @else if (isNoResults) {
+    <ion-list>
+      <!-- title sorter -->
       <ion-item>
-        <ion-label>
-          <h1>No Results</h1>
-        </ion-label>
+        <ion-label>Title Order:</ion-label>
+        <ion-segment [value]="titleOrderSegement" (ionChange)="reorderList($event)" class="filterSegement">
+          <ion-segment-button value="az">
+            <ion-label>A-Z</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="za">
+            <ion-label>Z-A</ion-label>
+          </ion-segment-button>
+        </ion-segment>
       </ion-item>
-    }
-    @else {
-      <ion-list [inset]="true">
 
-        @for(cexEntry of cexList; track cexEntry){
-          <ion-item>
-            <ion-label>
-              {{cexEntry.description}}
-              <ion-note>{{cexEntry.format}}</ion-note>
-            </ion-label>
-            <ion-badge [color]="cexEntry.cost == 3 ? 'warning' : cexEntry.cost >= 2 && cexEntry.cost < 3 ? 'primary' : 'success'">{{cexEntry.cost | currency: 'GBP'}}</ion-badge>
-            <!-- <ion-icon slot="end" name="chevron-back-outline" colour="medium" size="large" ></ion-icon> -->
-          </ion-item>
-        }
-      </ion-list>
-    }
-  </ion-content>
+      <!-- price sorter sorter -->
+      <ion-item>
+        <ion-label>Price Order:</ion-label>
+        <ion-toggle [checked]="isHighLowChecked" (ionChange)="reorderList($event)" labelPlacement="stacked" value="hl">High to Low</ion-toggle>
+        <ion-toggle [checked]="isLowHighChecked" (ionChange)="reorderList($event)" labelPlacement="stacked" value="lh">Low to High</ion-toggle>
+      </ion-item>
+    </ion-list>
 
   </ion-content>
+
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons slot="end">
+        <ion-button (click)="clearFilters()">
+          Clear Filters
+        </ion-button>
+      </ion-buttons> 
+    </ion-toolbar>
+  </ion-footer>
+</ion-menu>
+
+<div class="ion-page" id="cexListPage">
+  <ion-header [translucent]="false">
+    <ion-toolbar>
+      <ion-title>
+        Mr Tracker
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content [fullscreen]="true">
+    <ion-header [translucent]="true">
+      <ion-toolbar>
+        <ion-title>
+          <img [src]="iconCex" class="cexIcon"/>
+        </ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="revealFilterMenu()">
+          <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>  
+      </ion-toolbar>
+    </ion-header>
+  
+    <ion-content>
+      @if(isloading){
+        <ion-loading [isOpen]="isloading" message="Loading Cex Results..."></ion-loading>
+      } 
+      @else if (isNoResults) {
+        <ion-item>
+          <ion-label>
+            <h1>No Results</h1>
+          </ion-label>
+        </ion-item>
+      }
+      @else {
+        <ion-list [inset]="true">
+  
+          @for(cexEntry of cexList; track cexEntry){
+            <ion-item>
+              <ion-label>
+                {{cexEntry.description}}
+                <ion-note>{{cexEntry.format}}</ion-note>
+              </ion-label>
+              <ion-badge [color]="cexEntry.cost == 3 ? 'warning' : cexEntry.cost >= 2 && cexEntry.cost < 3 ? 'primary' : 'success'">{{cexEntry.cost | currency: 'GBP'}}</ion-badge>
+              <!-- <ion-icon slot="end" name="chevron-back-outline" colour="medium" size="large" ></ion-icon> -->
+            </ion-item>
+          }
+        </ion-list>
+      }
+    </ion-content>
+  
+  </ion-content>
+</div>
