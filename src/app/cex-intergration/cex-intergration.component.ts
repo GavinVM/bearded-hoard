@@ -26,13 +26,24 @@ export class CexIntergrationComponent  implements OnInit {
   }
 
   handleCexList(list: CexEntry[]){
+    console.debug('how many times this runs')
     if(list.length > 0){
-      this.cexList = list;
+      this.cexList = list.sort((a:CexEntry, b:CexEntry) => {
+        if (a.description < b.description) {
+          return -1;
+        }
+        if (a.description > b.description) {
+          return 1;
+        }
+      
+        // names must be equal
+        return 0;
+      
+      });
       this.isloading = false;
+      this.isNoResults = false;
     } else {
       this.isNoResults = true;
-
-      let temp:string = ''
     }
   }
 

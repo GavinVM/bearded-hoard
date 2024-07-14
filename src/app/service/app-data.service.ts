@@ -11,6 +11,7 @@ import { CexEntry } from '../model/cex-entry.model';
 
 const TRACKER_LIST = 'trackerList';
 const CEX_LIST = 'cexList';
+const EXPIRY_DURATION = 604800000;
 
 @Injectable({
   providedIn: 'root'
@@ -177,11 +178,12 @@ export class AppDataService {
   async getCexList(){
     console.info(`mrTracker.AppDataService.getCexList:: Starting`) 
     this.getList(CEX_LIST).then((storageResponse:StorageResponse) =>{
-      console.info(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
+      console.debug(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
       if(storageResponse.status){
-        console.info(`mrTracker.AppDataService.getCexList:: status is ${storageResponse.status}, getting CexResults`) 
+        console.debug(`mrTracker.AppDataService.getCexList:: status is ${storageResponse.status}, getting CexResults`) 
         let cexResults: CexResults = storageResponse.item
         if(this.sessionValid(cexResults.expiry)){
+          console.info(`mrTracker.AppDataService.getCexList:: session is valid`)
           this.cexListReadyEmitter.emit(cexResults.cexList)
         } else {
           console.info(`mrTracker.AppDataService.getCexList:: session expired, updating list`)
@@ -201,15 +203,14 @@ export class AppDataService {
   }
 
   sessionValid(expiry: Date){  
-    let toDate = new Date()
-    
-    console.log(`mrTracker.AppDataService.sessionValid:: expiry and toDate equals ${expiry == toDate}`)
-    console.log(`mrTracker.AppDataService.sessionValid:: expiry and toDate local string equals ${expiry.toLocaleString() == toDate.toLocaleString()}`)
-    return false;
+    console.log(`mrTracker.AppDataService.sessionValid:: validating session`)
+    console.debug(`mrTracker.AppDataService.sessionValid:: expected difference is ${EXPIRY_DURATION} but got ${(Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString()))}`)
+    console.debug(`mrTracker.AppDataService.sessionValid:: dates before parse are `, expiry,new Date())
+    console.debug(`mrTracker.AppDataService.sessionValid:: restult was ${(Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString())) < EXPIRY_DURATION}`)
+    return (Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString())) < EXPIRY_DURATION;
   }
 
   getList(list:string){
-    // handle storage not ready here instead of on the component level
     return this.isStorageReady ? this.storageService.getEntry(list) : new Promise<StorageResponse>(resolve => resolve({status: false}))
   }
 

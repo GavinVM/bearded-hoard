@@ -55,38 +55,58 @@ export class CexService {
         return requestList;
       })
     )
-    .subscribe((requestList:any) => {
-      forkJoin((requestList)).subscribe((results:any) => {
-        results.forEach((resultSet:any) => {
-          console.debug(`mrTracker.CexService.updateList:: cex returned for page ${resultSet.page}`, resultSet)
+    .pipe(
+      mergeMap((requestList:any) =>  this.getAllSearchRestults(requestList))
+      
+      // console.debug('inside mergeMap subscribe called')
+    )
+    .subscribe({
+      next: (completeResulSet:any) => {
+        console.log(`mrTracker.CexService.updateList:: complete result set looks like`, completeResulSet)
+        this.cexList.push(completeResulSet)
+      },
+      complete: () => {
+        console.log('mrTracker.CexService.updateList:: saving results from queries')
+        this.storageService.setEntry('cexList', this.cexResults).then(
+          (response: StorageResponse) => {
+            if(response.status){
+              this.cexListUpdateCompleteEmitter.emit(this.cexResults);
+            } else {
+              this.cexListUpdateCompleteEmitter.emit({cexList: [], expiry: new Date})
+            }
+        }
+      )
+    }
+  });
+}
+
+  getAllSearchRestults(requestList:any){
+    return forkJoin((requestList)).pipe(
+      mergeMap((forkResults:any) => {
+      console.log(`mrTracker.CexService.getAllSearchRestults:: fork results set is`, forkResults)
+        let tempCexList: CexEntry[] = [];
+        forkResults.forEach((resultSet:any) => {
+          console.debug(`mrTracker.CexService.getAllSearchRestults:: cex returned for page ${resultSet.page}`, resultSet)
           resultSet.hits
-          // .filter((hit:any) => !this.existingTitles.includes(hit.boxName.substring(0, hit.boxName.indexOf('('))))
+          .filter((hit:any) => this.existingTitles.indexOf(this.formatBoxName(hit.boxName))  == -1)
           .filter((hit:any) => hit.availability.includes("In Stock Online"))
           .filter((hit:any) => hit.sellPrice < 4)
           .forEach((hit:any) => {
-            this.cexList.push({
+            tempCexList.push({
               cexId: hit.boxId,
               cost: hit.sellPrice,
-              description: hit.boxName.substring(0, hit.boxName.indexOf('(')),
+              description: this.formatBoxName(hit.boxName),
               format: this.convertFormat(hit.categoryFriendlyName)
             })
           })
-  
-        this.cexResults.cexList = this.cexList
+        
         })
-  
-        
-      })
-        
-    }).add(() => {
-      this.storageService.setEntry('cexList', this.cexResults).then((response: StorageResponse) => {
-        if(response.status){
-          this.cexListUpdateCompleteEmitter.emit(this.cexResults);
-        } else {
-          this.cexListUpdateCompleteEmitter.emit({cexList: [], expiry: new Date})
-        }
-      });
+        console.log(`mrTracker.CexService.getAllSearchRestults:: tempCexList set is`, tempCexList)
+      return tempCexList;    
+      
     })
+  )
+
   }
 
   getSearchResults(searchQuery?: Map<string,string>){
@@ -103,6 +123,10 @@ export class CexService {
 
     return this.http.get(environment.cexSearchApiBase, {params: urlPrams});
     
+  }
+
+  formatBoxName(boxName:string):string{
+    return boxName.indexOf('(') != -1 ? boxName.substring(0, boxName.indexOf('(')) : boxName;
   }
 
   convertFormat(cexCategory:string):string{

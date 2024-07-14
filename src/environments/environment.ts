@@ -26,7 +26,7 @@ export const environment = {
   cexSearchApiBase: 'https://search.webuy.io/1/indexes/prod_cex_uk',
   cexDefaultSearchParams: new Map<string, string>([
     ['page', '0'],
-    ['hitsPerPage', '1'],
+    ['hitsPerPage', '10'],
     ['query', 'Blu-Ray'],
   ])
 };
