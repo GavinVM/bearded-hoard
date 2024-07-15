@@ -14,25 +14,61 @@
 
   <ion-content>
     <ion-list>
-      <!-- title sorter -->
+      <!-- reorder list -->
       <ion-item>
-        <ion-label>Title Order:</ion-label>
-        <ion-segment [value]="titleOrderSegement" (ionChange)="reorderList($event)" class="filterSegement">
-          <ion-segment-button value="az">
-            <ion-label>A-Z</ion-label>
+        <ion-label>Reorder:</ion-label>
+        <ion-select interface="popover" (ionChange)="reorderList($event)" [value]="">
+          <ion-select-option value="az">A-Z</ion-select-option>
+          <ion-select-option value="za">Z-A</ion-select-option>
+          <ion-select-option value="hl">High to Low Price</ion-select-option>
+          <ion-select-option value="hl">Low to High Price</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- format sorter -->
+      <ion-item>
+        <ion-label>Format:</ion-label>
+        <ion-segment [value]="formatSegement" (ionChange)="formatFilter($event)">
+          <ion-segment-button value="all">
+            <ion-label>All</ion-label>
           </ion-segment-button>
-          <ion-segment-button value="za">
-            <ion-label>Z-A</ion-label>
+          <ion-segment-button value="bl">
+            <ion-icon [src]="getMediaTypeIcon('blu-ray')" class="formatIcons"></ion-icon>
+          </ion-segment-button>
+          <ion-segment-button value="4k">
+            <ion-icon [src]="getMediaTypeIcon('4k')" class="formatIcons"></ion-icon>
           </ion-segment-button>
         </ion-segment>
       </ion-item>
+    
 
-      <!-- price sorter sorter -->
+      <!-- Price range -->
       <ion-item>
-        <ion-label>Price Order:</ion-label>
-        <ion-toggle [checked]="isHighLowChecked" (ionChange)="reorderList($event)" labelPlacement="stacked" value="hl">High to Low</ion-toggle>
-        <ion-toggle [checked]="isLowHighChecked" (ionChange)="reorderList($event)" labelPlacement="stacked" value="lh">Low to High</ion-toggle>
+        <ion-label>Price Range:</ion-label>
+        @if(isPriceRangeLoading){
+          <ion-spinner name="dots"></ion-spinner>
+      }
+        <ion-item lines="none" class="priceRangeInput">
+          <ion-input name="min" 
+                    labelPlacement="stacked" 
+                    label="Min" 
+                    placeholder="£" 
+                    [clearInput]="true"  
+                    (ionInput)="priceRangeFilter($event)" 
+                    [value]="minPriceInput"
+                    inputmode="numeric"></ion-input>
+          <ion-input name="max" 
+                    labelPlacement="stacked" 
+                    label="Max" 
+                    placeholder="£" 
+                    [clearInput]="true"
+                    (ionInput)="priceRangeFilter($event)" 
+                    [value]="maxPriceInput"
+                    inputmode="numeric"></ion-input>
+        </ion-item>
       </ion-item>
+
+    
     </ion-list>
 
   </ion-content>
@@ -56,8 +92,6 @@
       </ion-title>
     </ion-toolbar>
   </ion-header>
-  
-  <ion-content [fullscreen]="true">
     <ion-header [translucent]="true">
       <ion-toolbar>
         <ion-title>
@@ -98,6 +132,4 @@
         </ion-list>
       }
     </ion-content>
-  
-  </ion-content>
 </div>
