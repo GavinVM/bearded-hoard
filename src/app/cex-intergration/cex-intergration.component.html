@@ -17,18 +17,18 @@
       <!-- reorder list -->
       <ion-item>
         <ion-label>Reorder:</ion-label>
-        <ion-select interface="popover" (ionChange)="reorderList($event)" [value]="">
+        <ion-select interface="popover" (ionChange)="reorderList($event)" #reorderSelect>
           <ion-select-option value="az">A-Z</ion-select-option>
           <ion-select-option value="za">Z-A</ion-select-option>
           <ion-select-option value="hl">High to Low Price</ion-select-option>
-          <ion-select-option value="hl">Low to High Price</ion-select-option>
+          <ion-select-option value="lh">Low to High Price</ion-select-option>
         </ion-select>
       </ion-item>
 
       <!-- format sorter -->
       <ion-item>
         <ion-label>Format:</ion-label>
-        <ion-segment [value]="formatSegement" (ionChange)="formatFilter($event)">
+        <ion-segment #formatSegement (ionChange)="formatFilter($event)">
           <ion-segment-button value="all">
             <ion-label>All</ion-label>
           </ion-segment-button>
@@ -55,7 +55,7 @@
                     placeholder="£" 
                     [clearInput]="true"  
                     (ionInput)="priceRangeFilter($event)" 
-                    [value]="minPriceInput"
+                    #minPriceInput
                     inputmode="numeric"></ion-input>
           <ion-input name="max" 
                     labelPlacement="stacked" 
@@ -63,7 +63,7 @@
                     placeholder="£" 
                     [clearInput]="true"
                     (ionInput)="priceRangeFilter($event)" 
-                    [value]="maxPriceInput"
+                    #maxPriceInput
                     inputmode="numeric"></ion-input>
         </ion-item>
       </ion-item>
