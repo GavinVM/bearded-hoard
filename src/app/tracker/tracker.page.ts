@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataService } from '../service/app-data.service';
 import { Entry } from '../model/entry.model';
 import { StorageResponse } from '../model/storage-response.model';
 import { TabsService } from '../service/tabs.service';
 import { environment } from 'src/environments/environment';
-import { ItemReorderEventDetail } from '@ionic/angular';
+import { IonCheckbox, ItemReorderEventDetail } from '@ionic/angular';
 
 const GRID: string = 'grid';
-const REORDER_TOGGLED: string = 'filled';
-const REORDER_PENDING: string = '';
+const TOGGLED: string = 'filled';
+const PENDING: string = '';
 
 
 
@@ -23,12 +23,18 @@ export class TrackerPage implements OnInit{
   isWaitingForStorage!: boolean;
   isGrid!: boolean;
   isReorder!: boolean;
+  isDelete!: boolean;
+  isItemChecked!: boolean;
   changeReorder!: boolean;
   savePopoverState!: boolean;
   trackerList!: Entry[];
   previousTrackerList!: Entry[];
+  deleteEntryList!: string[];
   imagePreFix!: string;
   reorderButtonState! :string;
+  deleteEntryButtonState!: string;
+
+  @ViewChild('deleteListCheckbox') deleteListCheckbox!: IonCheckbox;
 
   constructor(private appDataService: AppDataService,
               private tabService: TabsService) {}
@@ -39,10 +45,14 @@ export class TrackerPage implements OnInit{
     this.isWaitingForStorage = false;
     this.isGrid = true;
     this.isReorder = false;
+    this.isDelete = false;
+    this.isItemChecked = false;
     this.changeReorder = false;
     this.savePopoverState = false;
-    this.reorderButtonState = REORDER_PENDING;
+    this.reorderButtonState = PENDING;
+    this.deleteEntryButtonState = PENDING;
     this.previousTrackerList = []
+    this.deleteEntryList = [];
     this.imagePreFix = environment.tmdbImageBase;
     this.tabService.tabChangingEmiter.subscribe(tab => this.activeTabReload(tab))
     this.appDataService.trackerListEventEmittter.subscribe(trackerList => this.loadTrackerList(trackerList))
@@ -86,13 +96,43 @@ export class TrackerPage implements OnInit{
     return entry.overview.substring(0, entry.overview.indexOf(' ', detailLength))
   }
 
+  clearCheckBoxes(){
+    this.isItemChecked = false;
+    this.deleteListCheckbox.checked = false;
+  }
+
+  toggleDelete(){
+    console.info(`mrTracker.TrackerPage.toggleDelete:: starting`)
+    this.isDelete = !this.isDelete;
+    this.isReorder = false;
+
+    console.info(`mrTracker.TrackerPage.toggleDelete:: finishing`)
+  }
+
+  updateDeleteEntryList(event:any){
+    console.info(`mrTracker.TrackerPage.updateDeleteEntryList:: starting`)
+    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: passed in event, `, event)
+    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: current checked status is ${event.detail.checked} and id is ${event.detail.value}`)
+    if(event.detail.checked){
+      this.isItemChecked = true;
+      console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: adding id to list`)
+      this.deleteEntryList.push(event.detail.value);
+    } else {
+      console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: removing id`)
+      this.deleteEntryList = this.deleteEntryList.filter((id:string) => id != event.detail.value);
+    }
+    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: delete list is now`, this.deleteEntryList)
+    console.info(`mrTracker.TrackerPage.updateDeleteEntryList:: finishing`)
+  }
+
   toggleReorder(): void{
     console.info(`mrTracker.TrackerPage.toggleReorder:: starting`)
     if(!this.isReorder){
       console.info(`mrTracker.TrackerPage.toggleReorder:: setting to true`)
       this.previousTrackerList = this.trackerList
       this.isReorder = true;
-      this.reorderButtonState = REORDER_TOGGLED
+      this.isDelete = false;
+      this.reorderButtonState = TOGGLED
       this.savePopoverState = true;
       console.info(`mrTracker.TrackerPage.toggleReorder:: ready to accept changes`)
     } else if(this.isReorder) {
@@ -112,7 +152,7 @@ export class TrackerPage implements OnInit{
       })
       } 
       console.info(`mrTracker.TrackerPage.toggleReorder:: reverting state to statndard list`)
-      this.reorderButtonState = REORDER_PENDING
+      this.reorderButtonState = PENDING
       this.isReorder = false;
     }
     console.info(`mrTracker.TrackerPage.toggleReorder:: finishing`)

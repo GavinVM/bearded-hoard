@@ -11,16 +11,6 @@
         <ion-icon name="list-outline"></ion-icon>
       </ion-segment-button>
     </ion-segment> 
-    <!-- <ion-buttons slot="end">
-      <ion-button (click)="toggleGridListView()">
-        @if(isGrid){
-          <ion-icon slot="icon-only" name="list-outline"></ion-icon>
-        }
-        @else {
-          <ion-icon slot="icon-only" name="grid-outline"></ion-icon>
-        }
-      </ion-button>
-    </ion-buttons> -->
   </ion-toolbar>
 </ion-header>
 
@@ -49,9 +39,33 @@
   @else {
     <ion-toolbar>
       <ion-buttons slot="end">
-        <ion-button id="reorderButton"(click)="toggleReorder()" [type]="reorderButtonState">
-          @if(isReorder){
+        <ion-button id="clearCheckBoxButton"(click)="clearCheckBoxes()" [type]="deleteEntryButtonState">
+          @if(isDelete && !isReorder){
+            @if(isItemChecked){
+              <ion-icon name="checkmark-circle"></ion-icon>
+            }
+            @else {
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+            }
+          }
+        </ion-button>
+        <ion-button id="deleteEntryButton"(click)="toggleDelete()" [type]="deleteEntryButtonState">
+          @if(isDelete && !isReorder){
             <ion-icon name="save-outline"></ion-icon>
+          }
+          @else if(!isDelete && isReorder){
+
+          }
+          @else {
+            <ion-icon name="trash-outline"></ion-icon>
+          }
+        </ion-button>
+        <ion-button id="reorderButton"(click)="toggleReorder()" [type]="reorderButtonState">
+          @if(isReorder && !isDelete){
+            <ion-icon name="save-outline"></ion-icon>
+          }
+          @else if(!isReorder && isDelete){
+
           }
           @else {
             <ion-icon name="reorder-three-outline"></ion-icon>
@@ -61,17 +75,40 @@
         
     </ion-toolbar>
     <ion-list [inset]="true">
-      <ion-reorder-group [disabled]="!isReorder" (ionItemReorder)="handleReorder($any($event))">
+      @if(isDelete){
         @for(entry of trackerList; track entry.title){
           <ion-item>
-            <ion-label>
-              {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
-              <ion-note>  {{formatDetail(entry)}}...</ion-note>
-            </ion-label>
-            <ion-reorder slot="end"></ion-reorder>
+            <ion-checkbox #deleteListCheckbox value="{{entry.apiId}}" (ionChange)="updateDeleteEntryList($event)">
+              <ion-label>
+                {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
+                <ion-note>  {{formatDetail(entry)}}...</ion-note>
+              </ion-label>
+            </ion-checkbox>
           </ion-item>
         }
-      </ion-reorder-group>
+      }
+      @else if(isReorder){
+        <ion-reorder-group [disabled]="!isReorder" (ionItemReorder)="handleReorder($any($event))">
+          @for(entry of trackerList; track entry.title){
+            <ion-item>
+              <ion-label>
+                {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
+                <ion-note>  {{formatDetail(entry)}}...</ion-note>
+              </ion-label>
+              <ion-reorder slot="end"></ion-reorder>
+            </ion-item>
+          }
+        </ion-reorder-group>
+      }@else {
+          @for(entry of trackerList; track entry.title){
+            <ion-item>
+              <ion-label>
+                {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
+                <ion-note>  {{formatDetail(entry)}}...</ion-note>
+              </ion-label>
+            </ion-item>
+          }
+      }
     </ion-list>
   }
 </ion-content>
