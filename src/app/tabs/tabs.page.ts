@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { TabsService } from '../service/tabs.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tabs',
@@ -8,7 +9,11 @@ import { TabsService } from '../service/tabs.service';
 })
 export class TabsPage {
 
-  constructor(private tabService: TabsService) {}
+  cexOutline!: string;
+
+  constructor(private tabService: TabsService) {
+    this.cexOutline = environment.icons('cex', true);
+  }
 
   tabChangeHandler(event:{tab: string}){
     this.tabService.triggerTabChangingEmmiter(event.tab);

@@ -45,7 +45,8 @@ export class TrackerPage implements OnInit{
     this.previousTrackerList = []
     this.imagePreFix = environment.tmdbImageBase;
     this.tabService.tabChangingEmiter.subscribe(tab => this.activeTabReload(tab))
-    this.loadTrackerList();
+    this.appDataService.trackerListEventEmittter.subscribe(trackerList => this.loadTrackerList(trackerList))
+    this.appDataService.getTrackerList();
     console.info(`mrTracker.TrackerPage.ngOnInit:: finishing`)
   }
 
@@ -54,40 +55,19 @@ export class TrackerPage implements OnInit{
     console.log(`tab changing to ${tabName}`)
     if(tabName.includes('tracker')){
       console.info(`mrTracker.TrackerPage.activeTabReload:: this component tab active, loading data`)
-      this.loadTrackerList();
+      this.appDataService.getTrackerList();
       console.info(`mrTracker.TrackerPage.activeTabReload:: data loaded`)
     }
     console.info(`mrTracker.TrackerPage.activeTabReload:: finishing`)
   }
 
-  async loadTrackerList(){
+  loadTrackerList(trackerList: Entry[]){
     console.info(`mrTracker.TrackerPage.loadTrackerList:: ${this.isWaitingForStorage ? 'restarting' : 'starting'}`)
 
-    this.appDataService.getTrackerList()
-    .then((response: StorageResponse) => {
-      if(response.status){
-        console.info(`mrTracker.TrackerPage.loadTrackerList:: storage ready getting list`)
-        this.trackerList = response.item?? []
-        this.isLoading = false;
-        console.log(`got the list:`)
-        console.log(this.trackerList)
-        console.info(`mrTracker.TrackerPage.loadTrackerList:: finishing`)
-        this.isWaitingForStorage = false;
-      } else {
-        if(response.errorMessage){
-          console.info('mrTracker.TrackerPage.loadTrackerList:: list empty, starting new list')
-          this.trackerList = []
-        } else {
-          this.isWaitingForStorage = true;
-          console.info(`mrTracker.TrackerPage.loadTrackerList:: storage not ready, retrying in 2 seconds`)
-          setTimeout(() => {
-            this.loadTrackerList();
-          }, 2000)
-          
-        }
-      }
-      
-    })
+    this.trackerList = trackerList;
+    this.isLoading = false;
+    console.log(`got the list:`, this.trackerList)
+    console.info(`mrTracker.TrackerPage.loadTrackerList:: finishing`)
   }
 
   toggleGridListView(event: any): void {

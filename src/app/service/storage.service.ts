@@ -1,6 +1,4 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Observable, map, throwError } from 'rxjs';
-import { Entry } from '../model/entry.model';
 import { Storage } from '@ionic/storage-angular';
 import { StorageResponse } from '../model/storage-response.model';
 
@@ -62,12 +60,13 @@ export class StorageService {
     try {
       console.log(`mrTracker.StorageService.getEntry:: starting`)
       console.debug(`mrTracker.StorageService.getEntry:: passed in parameters key: ${key}`)
-      const length = await this.ionStorage.length()
+      let length = await this.ionStorage.length()
       console.debug(`mrTracker.StorageService.getEntry:: storage lenth is ${length}`)
       if(length == 0){
         this.storageResponse.errorMessage = 'empty'
       } else {
-        const item = await this.ionStorage.get(key);
+        let item = await this.ionStorage.get(key);
+        if(item == null) throw 'key not found'
         this.storageResponse.status = true;
         this.storageResponse.item = item
         console.debug(`mrTracker.StorageService.getEntry:: got entry for ${key}`, item)

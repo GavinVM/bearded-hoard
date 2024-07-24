@@ -16,6 +16,10 @@ const routes: Routes = [
         loadChildren: () => import('../tracker/tracker.module').then(m => m.TrackerPageModule)
       },
       {
+        path: 'cex',
+        loadChildren: () => import('../cex-intergration/cex-intergration.module').then(m => m.CexIntergrationModule)
+      },
+      {
         path: '',
         redirectTo: '/tabs/tracker',
         pathMatch: 'full'

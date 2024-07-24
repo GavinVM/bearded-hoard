@@ -1,12 +1,17 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { mergeMap, of, switchMap} from 'rxjs';
+import { mergeMap, Observable, of, switchMap} from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
 import { StorageResponse } from '../model/storage-response.model';
 import { Entry } from '../model/entry.model';
+import { CexResults } from '../model/cex-results.model';
+import { CexService } from './cex.service';
+import { CexEntry } from '../model/cex-entry.model';
 
 const TRACKER_LIST = 'trackerList';
+const CEX_LIST = 'cexList';
+const EXPIRY_DURATION = 604800000;
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +22,15 @@ export class AppDataService {
   tmdbHeaders: HttpHeaders;
 
   savedEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
+  trackerListEventEmittter: EventEmitter<Entry[]> = new EventEmitter()
+  cexListReadyEmitter: EventEmitter<CexEntry[]> = new EventEmitter()
 
   constructor(private http: HttpClient,
-              private storageService: StorageService) {
+              private storageService: StorageService,
+              private cexService: CexService) {
 
     this.storageService.storageReadyEmitter.subscribe((status: boolean) => this.isStorageReady = status)
+    this.cexService.cexListUpdateCompleteEmitter.subscribe(cexResults => this.cexListReadyEmitter.emit(cexResults.cexList))
     this.tmdbHeaders = new HttpHeaders({
       Authorization: `Bearer ${environment.accessTokenAuth}`,
       'accept': 'application/json'
@@ -148,6 +157,65 @@ export class AppDataService {
   }
 
   getTrackerList(){
-    return this.isStorageReady ? this.storageService.getEntry(TRACKER_LIST) : new Promise<StorageResponse>(resolve => resolve({status: false}))
+    this.getList(TRACKER_LIST).then((response:StorageResponse) => {
+      if(response.status){
+        console.info(`mrTracker.AppDataService.getTrackerList:: storage ready triggering trackerList event`)
+        this.trackerListEventEmittter.emit(response.item?? [])
+      } else {
+        if(response.errorMessage){
+          console.info('mrTracker.AppDataService.getTrackerList:: list empty, triggering trackerList with empty list')
+          this.trackerListEventEmittter.emit([])
+        } else {
+          console.info(`mrTracker.AppDataService.getTrackerList:: storage not ready, retrying in 2 seconds`)
+          setTimeout(() => {
+            this.getTrackerList();
+          }, 2000)
+        }
+      }
+    });
   }
+
+  async getCexList(){
+    console.info(`mrTracker.AppDataService.getCexList:: Starting`) 
+    this.getList(CEX_LIST).then((storageResponse:StorageResponse) =>{
+      console.debug(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
+      if(storageResponse.status){
+        console.debug(`mrTracker.AppDataService.getCexList:: status is ${storageResponse.status}, getting CexResults`) 
+        let cexResults: CexResults = storageResponse.item
+        if(this.sessionValid(cexResults.expiry)){
+          console.info(`mrTracker.AppDataService.getCexList:: session is valid`)
+          this.cexListReadyEmitter.emit(cexResults.cexList)
+        } else {
+          console.info(`mrTracker.AppDataService.getCexList:: session expired, updating list`)
+           this.cexService.updateList()
+        }
+      } else {
+        if(this.isStorageReady){
+          console.info(`mrTracker.AppDataService.getCexList:: storage is ready updating list`)
+           this.cexService.updateList()
+        } else {
+          console.info(`mrTracker.AppDataService.getCexList:: storage is pending, waiting 2 seconds`)
+          setTimeout(() => {this.getCexList()}, 1000)
+        }
+      }
+    });
+    console.info(`mrTracker.AppDataService.getCexList:: finishing`) 
+  }
+
+  sessionValid(expiry: Date){  
+    console.log(`mrTracker.AppDataService.sessionValid:: validating session`)
+    console.debug(`mrTracker.AppDataService.sessionValid:: expected difference is ${EXPIRY_DURATION} but got ${(Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString()))}`)
+    console.debug(`mrTracker.AppDataService.sessionValid:: dates before parse are `, expiry,new Date())
+    console.debug(`mrTracker.AppDataService.sessionValid:: restult was ${(Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString())) < EXPIRY_DURATION}`)
+    return (Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString())) < EXPIRY_DURATION;
+  }
+
+  getList(list:string){
+    return this.isStorageReady ? this.storageService.getEntry(list) : new Promise<StorageResponse>(resolve => resolve({status: false}))
+  }
+
+  
+
+
+
 }

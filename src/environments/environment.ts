@@ -5,6 +5,7 @@
 const baseTMDBUrl: string = 'https://api.themoviedb.org/3/';
 // const api: string = 'https://4gsgpp-8081.csb.app/api/';
 const api: string = 'http://localhost:8081/api/';
+const cexSearchApiBase: string = 'https://search.webuy.io/1/indexes/prod_cex_uk';
 
 export const environment = {
   production: false,
@@ -21,10 +22,16 @@ export const environment = {
   tmdbImageBase: 'https://image.tmdb.org/t/p/original',
   icons: (icon:string, outlined?:boolean | false) => {
     return `/assets/icon/${icon}${outlined ? '-outline':''}.svg`
-  }
+  },
+  cexSearchApiBase: 'https://search.webuy.io/1/indexes/prod_cex_uk',
+  cexDefaultSearchParams: new Map<string, string>([
+    ['page', '0'],
+    ['hitsPerPage', '10'],
+    ['query', 'Blu-Ray'],
+  ])
 };
 
-// https://github.com/Dionakra/webuy-api/tree/master
+// https://search.webuy.io/1/indexes/prod_cex_uk?page=2&hitsPerPage=100&query=categoryName=Blu-Ray%204k
 
 
 
