@@ -24,7 +24,6 @@ export class TrackerPage implements OnInit{
   isGrid!: boolean;
   isReorder!: boolean;
   isDelete!: boolean;
-  isItemChecked!: boolean;
   changeReorder!: boolean;
   savePopoverState!: boolean;
   trackerList!: Entry[];
@@ -33,8 +32,6 @@ export class TrackerPage implements OnInit{
   imagePreFix!: string;
   reorderButtonState! :string;
   deleteEntryButtonState!: string;
-
-  @ViewChild('deleteListCheckbox') deleteListCheckbox!: IonCheckbox;
 
   constructor(private appDataService: AppDataService,
               private tabService: TabsService) {}
@@ -46,7 +43,6 @@ export class TrackerPage implements OnInit{
     this.isGrid = true;
     this.isReorder = false;
     this.isDelete = false;
-    this.isItemChecked = false;
     this.changeReorder = false;
     this.savePopoverState = false;
     this.reorderButtonState = PENDING;
@@ -76,7 +72,7 @@ export class TrackerPage implements OnInit{
 
     this.trackerList = trackerList;
     this.isLoading = false;
-    console.log(`got the list:`, this.trackerList)
+    console.debug(`mrTracker.TrackerPage.loadTrackerList:: got the list:`, this.trackerList)
     console.info(`mrTracker.TrackerPage.loadTrackerList:: finishing`)
   }
 
@@ -96,9 +92,16 @@ export class TrackerPage implements OnInit{
     return entry.overview.substring(0, entry.overview.indexOf(' ', detailLength))
   }
 
-  clearCheckBoxes(){
-    this.isItemChecked = false;
-    this.deleteListCheckbox.checked = false;
+  toggleCheckBoxes(){
+    console.info(`mrTracker.TrackerPage.toggleCheckBoxes:: starting`)
+    if(this.deleteEntryList.length == 0){
+      console.info(`mrTracker.TrackerPage.toggleCheckBoxes:: delete list empty, checking all items`)
+      this.deleteEntryList = this.trackerList.map((entry:Entry) => entry.apiId);
+    } else {
+      console.info(`mrTracker.TrackerPage.toggleCheckBoxes:: list populated clearting`)
+      this.deleteEntryList = [] 
+    }
+    console.info(`mrTracker.TrackerPage.toggleCheckBoxes:: finish`)
   }
 
   toggleDelete(){
@@ -109,20 +112,27 @@ export class TrackerPage implements OnInit{
     console.info(`mrTracker.TrackerPage.toggleDelete:: finishing`)
   }
 
-  updateDeleteEntryList(event:any){
+  getIsChecked(id:string):boolean {
+    return this.deleteEntryList.indexOf(id) != -1
+  }
+
+  updateDeleteEntryList(apiId:string, checked:boolean){
     console.info(`mrTracker.TrackerPage.updateDeleteEntryList:: starting`)
-    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: passed in event, `, event)
-    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: current checked status is ${event.detail.checked} and id is ${event.detail.value}`)
-    if(event.detail.checked){
-      this.isItemChecked = true;
+    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: current checked status is ${checked} and id is ${apiId}`)
+    
+    if(checked){
       console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: adding id to list`)
-      this.deleteEntryList.push(event.detail.value);
+      this.deleteEntryList.push(apiId);
     } else {
       console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: removing id`)
-      this.deleteEntryList = this.deleteEntryList.filter((id:string) => id != event.detail.value);
+      this.deleteEntryList = this.deleteEntryList.filter((id:string) => id != apiId);
     }
     console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: delete list is now`, this.deleteEntryList)
     console.info(`mrTracker.TrackerPage.updateDeleteEntryList:: finishing`)
+  }
+
+  deleteEntries(){
+    
   }
 
   toggleReorder(): void{

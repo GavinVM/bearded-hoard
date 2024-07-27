@@ -39,9 +39,9 @@
   @else {
     <ion-toolbar>
       <ion-buttons slot="end">
-        <ion-button id="clearCheckBoxButton"(click)="clearCheckBoxes()" [type]="deleteEntryButtonState">
+        <ion-button id="clearCheckBoxButton"(click)="toggleCheckBoxes()" [type]="deleteEntryButtonState">
           @if(isDelete && !isReorder){
-            @if(isItemChecked){
+            @if(deleteEntryList.length > 0){
               <ion-icon name="checkmark-circle"></ion-icon>
             }
             @else {
@@ -51,7 +51,12 @@
         </ion-button>
         <ion-button id="deleteEntryButton"(click)="toggleDelete()" [type]="deleteEntryButtonState">
           @if(isDelete && !isReorder){
-            <ion-icon name="save-outline"></ion-icon>
+            @if(deleteEntryList.length > 0){
+              <ion-icon name="save" (click)="deleteEntries()"></ion-icon>
+            }
+            @else {
+              <ion-icon name="save-outline"></ion-icon>
+            }
           }
           @else if(!isDelete && isReorder){
 
@@ -78,12 +83,16 @@
       @if(isDelete){
         @for(entry of trackerList; track entry.title){
           <ion-item>
-            <ion-checkbox #deleteListCheckbox value="{{entry.apiId}}" (ionChange)="updateDeleteEntryList($event)">
               <ion-label>
                 {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
                 <ion-note>  {{formatDetail(entry)}}...</ion-note>
               </ion-label>
-            </ion-checkbox>
+              @if(deleteEntryList.indexOf(entry.apiId) != -1){
+                <ion-icon  slot="end" name="checkmark-circle" (click)="updateDeleteEntryList(entry.apiId, false)"></ion-icon>
+              }
+              @else {
+                <ion-icon  slot="end" name="ellipse-outline" (click)="updateDeleteEntryList(entry.apiId, true)"></ion-icon>
+              }
           </ion-item>
         }
       }
@@ -111,4 +120,5 @@
       }
     </ion-list>
   }
+  <!-- create model to confirm items being deleted -->
 </ion-content>
