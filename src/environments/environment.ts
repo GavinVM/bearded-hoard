@@ -3,8 +3,6 @@
 // The list of file replacements can be found in `angular.json`.
 
 const baseTMDBUrl: string = 'https://api.themoviedb.org/3/';
-// const api: string = 'https://4gsgpp-8081.csb.app/api/';
-const api: string = 'http://localhost:8081/api/';
 const cexSearchApiBase: string = 'https://search.webuy.io/1/indexes/prod_cex_uk';
 
 export const environment = {
