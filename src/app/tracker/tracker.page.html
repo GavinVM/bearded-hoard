@@ -1,9 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tracker
+      Mr Tracker
     </ion-title>
-    <ion-segment slot="end" (ionChange)="toggleGridListView($event)" [value]="isGrid? 'grid' : 'list'">
+  </ion-toolbar>
+</ion-header>
+<ion-header>
+  <ion-toolbar>
+    <ion-segment slot="start" (ionChange)="toggleGridListView($event)" [value]="isGrid? 'grid' : 'list'">
       <ion-segment-button value="grid">
         <ion-icon name="grid-outline"></ion-icon>
       </ion-segment-button>
@@ -11,6 +15,58 @@
         <ion-icon name="list-outline"></ion-icon>
       </ion-segment-button>
     </ion-segment> 
+      <img src="/assets/logo/app-iconset/72.png" class="mrtrkIcon">
+    @if (!isGrid) {
+      <ion-buttons slot="end">
+        @if(isDelete && !isReorder){
+          <ion-button id="clearCheckBoxButton"(click)="toggleCheckBoxes()">
+              @if(deleteEntryList.length > 0){
+                <ion-icon name="checkmark-circle"></ion-icon>
+              }
+              @else {
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              }
+          </ion-button>
+        } @else if (changeReorder) {
+          <ion-button id="clearReorderButton"(click)="clearReorder()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        }
+        <ion-button id="deleteEntryButton"(click)="toggleDelete()" [type]="deleteEntryButtonState">
+          @if(isDelete && !isReorder){
+            @if(deleteEntryList.length > 0){
+              <ion-icon name="save"></ion-icon>
+            }
+            @else {
+              <ion-icon name="close-outline"></ion-icon>
+            }
+          }
+          @else if(!isDelete && isReorder){
+  
+          }
+          @else {
+            <ion-icon name="trash-outline"></ion-icon>
+          }
+        </ion-button>
+        <ion-button id="reorderButton"(click)="toggleReorder()" [type]="reorderButtonState">
+          @if(isReorder && !isDelete){
+            @if(changeReorder){
+              <ion-icon name="save"></ion-icon>
+            }
+            @else {
+              <ion-icon name="close-outline"></ion-icon>
+            }
+          }
+          @else if(!isReorder && isDelete){
+  
+          }
+          @else {
+            <ion-icon name="reorder-three-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-buttons>
+    }
+      
   </ion-toolbar>
 </ion-header>
 
@@ -37,57 +93,6 @@
     </ion-grid>
   }
   @else {
-    <ion-toolbar>
-      <ion-buttons slot="end">
-        @if(isDelete && !isReorder){
-          <ion-button id="clearCheckBoxButton"(click)="toggleCheckBoxes()">
-              @if(deleteEntryList.length > 0){
-                <ion-icon name="checkmark-circle"></ion-icon>
-              }
-              @else {
-                <ion-icon name="checkmark-circle-outline"></ion-icon>
-              }
-          </ion-button>
-        } @else if (changeReorder) {
-          <ion-button id="clearReorderButton"(click)="clearReorder()">
-            <ion-icon name="close-outline"></ion-icon>
-          </ion-button>
-        }
-        <ion-button id="deleteEntryButton"(click)="toggleDelete()" [type]="deleteEntryButtonState">
-          @if(isDelete && !isReorder){
-            @if(deleteEntryList.length > 0){
-              <ion-icon name="save"></ion-icon>
-            }
-            @else {
-              <ion-icon name="close-outline"></ion-icon>
-            }
-          }
-          @else if(!isDelete && isReorder){
-
-          }
-          @else {
-            <ion-icon name="trash-outline"></ion-icon>
-          }
-        </ion-button>
-        <ion-button id="reorderButton"(click)="toggleReorder()" [type]="reorderButtonState">
-          @if(isReorder && !isDelete){
-            @if(changeReorder){
-              <ion-icon name="save"></ion-icon>
-            }
-            @else {
-              <ion-icon name="close-outline"></ion-icon>
-            }
-          }
-          @else if(!isReorder && isDelete){
-
-          }
-          @else {
-            <ion-icon name="reorder-three-outline"></ion-icon>
-          }
-        </ion-button>
-      </ion-buttons>
-        
-    </ion-toolbar>
     <ion-list [inset]="true">
       @if(isDelete){
         @for(entry of trackerList; track entry.title){

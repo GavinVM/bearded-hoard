@@ -79,6 +79,8 @@ export class AddPage implements OnInit{
         }
       ];
     this.appDataService.getTrackerList()
+    window.addEventListener('online', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online'))
+    window.addEventListener('offline', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline'))
   }
 
   tabChange(tab:string){

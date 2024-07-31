@@ -32,7 +32,13 @@ export class CexService {
     console.debug(`mrTracker.CexService.updateList:: waiting for existing list`)
     await this.storageService.getEntry('trackerList').then((response: StorageResponse) => {
       if(response.status){
+        console.debug(`mrTracker.CexService.updateList:: list item returned`)
         this.existingTitles = response.item.map((entry: Entry) => entry.title);
+        console.debug(`mrTracker.CexService.updateList:: verifing list is populated`)
+        if(!this.existingTitles) this.existingTitles = []
+      } else {
+        console.debug(`mrTracker.CexService.updateList:: list empty`)
+        this.existingTitles = [];
       }
     })
     console.debug(`mrTracker.CexService.updateList:: got list`, this.existingTitles)
@@ -87,7 +93,8 @@ export class CexService {
         let tempCexList: CexEntry[] = [];
         forkResults.forEach((resultSet:any) => {
           console.debug(`mrTracker.CexService.getAllSearchRestults:: cex returned for page ${resultSet.page}`, resultSet)
-          resultSet.hits
+          if(this.existingTitles.length > 0){
+            resultSet.hits
           .filter((hit:any) => this.existingTitles.indexOf(this.formatBoxName(hit.boxName))  == -1)
           .filter((hit:any) => hit.availability.includes("In Stock Online"))
           .filter((hit:any) => hit.sellPrice < 4)
@@ -99,6 +106,19 @@ export class CexService {
               format: this.convertFormat(hit.categoryFriendlyName)
             })
           })
+          } else {
+            resultSet.hits
+          .filter((hit:any) => hit.availability.includes("In Stock Online"))
+          .filter((hit:any) => hit.sellPrice < 4)
+          .forEach((hit:any) => {
+            tempCexList.push({
+              cexId: hit.boxId,
+              cost: hit.sellPrice,
+              description: this.formatBoxName(hit.boxName),
+              format: this.convertFormat(hit.categoryFriendlyName)
+            })
+          })
+          }
         
         })
         console.log(`mrTracker.CexService.getAllSearchRestults:: tempCexList set is`, tempCexList)

@@ -36,6 +36,16 @@
         "timeout": "10s",
         "maxAge": "7d"
       }
+    },
+    {
+      "name": "cexResults",
+      "urls": ["https://search.webuy.io"],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 2000,
+        "timeout": "1m",
+        "maxAge": "7d"
+      }
     }
   ]
 }
