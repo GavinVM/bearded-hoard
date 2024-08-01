@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataService } from '../service/app-data.service';
-import { map, mergeMap } from 'rxjs';
+import { fromEvent, map, mergeMap, Observable } from 'rxjs';
 import { Entry } from '../model/entry.model';
 import { StorageResponse } from '../model/storage-response.model';
 import { TabsService } from '../service/tabs.service';
@@ -37,6 +37,9 @@ export class AddPage implements OnInit{
   isSaved4k!: Map<string, boolean>;
   isLoadingBluray!: Map<string, boolean>;
   isLoading4k!: Map<string, boolean>;
+
+  onlineEvent!: Observable<Event>;
+  offlineEvent!: Observable<Event>;
 
   @ViewChild('searchBarTextBox') searchbarTextBox!: IonSearchbar;
 
@@ -79,8 +82,10 @@ export class AddPage implements OnInit{
         }
       ];
     this.appDataService.getTrackerList()
-    window.addEventListener('online', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online'))
-    window.addEventListener('offline', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline'))
+    fromEvent(window, 'online').subscribe(() => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online'));
+    fromEvent(window, 'offline').subscribe(() => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline'))
+    // window.addEventListener('online', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online'))
+    // window.addEventListener('offline', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline'))
   }
 
   tabChange(tab:string){
