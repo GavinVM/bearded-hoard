@@ -25,6 +25,7 @@ export class AddPage implements OnInit{
   isToast!: boolean;
   isActionSheet!: boolean;
   isSeasonDetailsRunning!: boolean;
+  isOnline!: boolean;
 
   results!: any[];
   options!: any[];
@@ -64,6 +65,7 @@ export class AddPage implements OnInit{
     this.iconBlurayOutline = environment.icons('blu-ray', true);
     this.iconBluray = environment.icons('blu-ray');
     this.isSeasonDetailsRunning = false;
+    this.isOnline = true;
     this.appDataService.savedEventEmittter.subscribe(response => this.handleSavingEvent(response));
     this.tabService.tabChangingEmiter.subscribe(tab => this.tabChange(tab));
     this.appDataService.trackerListEventEmittter.subscribe((trackerList:Entry[]) => {
@@ -82,10 +84,17 @@ export class AddPage implements OnInit{
         }
       ];
     this.appDataService.getTrackerList()
-    fromEvent(window, 'online').subscribe(() => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online'));
-    fromEvent(window, 'offline').subscribe(() => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline'))
-    // window.addEventListener('online', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online'))
-    // window.addEventListener('offline', () => console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline'))
+    fromEvent(window, 'online').subscribe(() => this.setOnlineOfflineStatus(true));
+    fromEvent(window, 'offline').subscribe(() => this.setOnlineOfflineStatus(false))
+  }
+
+  setOnlineOfflineStatus(statusUpdate:boolean){
+    this.isOnline = statusUpdate
+    if(statusUpdate){
+      console.info('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online')
+    } else {
+      console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline')
+    }
   }
 
   tabChange(tab:string){

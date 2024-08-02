@@ -11,51 +11,71 @@
     <ion-toolbar>
       <ion-title>Add Entry</ion-title>
     </ion-toolbar>
-    <ion-toolbar>
-      <ion-searchbar #searchBarTextBox [debounce]="1000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
-    </ion-toolbar>
+    @if(isOnline){
+      <ion-toolbar>
+        <ion-searchbar #searchBarTextBox [debounce]="1000" [inputmode]="'search'" (ionInput)="getResults($event)"></ion-searchbar>
+      </ion-toolbar>
+    } @else{
+      <ion-toolbar>
+        <ion-title>Offline</ion-title>
+      </ion-toolbar>
+    }
+
   </ion-header>
 
   <ion-content>
-    <ion-list [inset]="true">
+@if(isOnline){
+  <ion-list [inset]="true">
 
-        @for(option of options; track option){
-          <ion-item-sliding>
-            <ion-item>
-              <ion-label>
-                {{option.title}}
-                <ion-note>@if(option.mediaType == 'tv'){: {{option.season}}} {{option.releaseYear}}</ion-note>
-              </ion-label>
-              <ion-icon slot="end" name="chevron-back-outline" colour="medium" size="large" ></ion-icon>
-            </ion-item>
+    @for(option of options; track option){
+      <ion-item-sliding>
+        <ion-item>
+          <ion-label>
+            {{option.title}}
+            <ion-note>@if(option.mediaType == 'tv'){: {{option.season}}} {{option.releaseYear}}</ion-note>
+          </ion-label>
+          <ion-icon slot="end" name="chevron-back-outline" colour="medium" size="large" ></ion-icon>
+        </ion-item>
 
-            <ion-item-options slide="end">
-              <ion-item-option color="primary">
-                @if(isLoadingBluray.get(option.id)){
-                  <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
-                } @else{
-                  @if(isSavedBluray.get(option.id)){
-                      <ion-icon slot="icon-only" [src]="iconBluray"  size="large" (click)="handleSelection(option, false, 'bluray')"></ion-icon>
-                    } @else {
-                      <ion-icon slot="icon-only" [src]="iconBlurayOutline"  size="large" (click)="handleSelection(option, true, 'bluray')"></ion-icon>
-                    }
-                }                
-              </ion-item-option>
-              <ion-item-option color="medium">
-                @if(isLoading4k.get(option.id)){
-                  <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
-                } @else{
-                  @if(isSaved4k.get(option.id)){
-                      <ion-icon slot="icon-only" [src]="icon4K" size="large" (click)="handleSelection(option, false, '4k')"></ion-icon>
-                    } @else {
-                      <ion-icon slot="icon-only" [src]="icon4KOutline" size="large" (click)="handleSelection(option, true, '4k')"></ion-icon>
-                    }
+        <ion-item-options slide="end">
+          <ion-item-option color="primary">
+            @if(isLoadingBluray.get(option.id)){
+              <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
+            } @else{
+              @if(isSavedBluray.get(option.id)){
+                  <ion-icon slot="icon-only" [src]="iconBluray"  size="large" (click)="handleSelection(option, false, 'bluray')"></ion-icon>
+                } @else {
+                  <ion-icon slot="icon-only" [src]="iconBlurayOutline"  size="large" (click)="handleSelection(option, true, 'bluray')"></ion-icon>
                 }
-              </ion-item-option>
-            </ion-item-options>
-          </ion-item-sliding>
-        }  
-    </ion-list>
+            }                
+          </ion-item-option>
+          <ion-item-option color="medium">
+            @if(isLoading4k.get(option.id)){
+              <ion-spinner slot="end" name="circular" size="large"></ion-spinner>
+            } @else{
+              @if(isSaved4k.get(option.id)){
+                  <ion-icon slot="icon-only" [src]="icon4K" size="large" (click)="handleSelection(option, false, '4k')"></ion-icon>
+                } @else {
+                  <ion-icon slot="icon-only" [src]="icon4KOutline" size="large" (click)="handleSelection(option, true, '4k')"></ion-icon>
+                }
+            }
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    }  
+</ion-list>
+}
+@else {
+  <ion-card>
+  <ion-card-header>
+    <ion-card-subtitle>Application Offline</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    Search and Add function not availble when disconnected from the internet. Please reconnnect to enable this function.
+  </ion-card-content>
+</ion-card>
+}
   </ion-content>
 </ion-content>
 
