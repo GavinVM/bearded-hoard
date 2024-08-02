@@ -11,7 +11,7 @@ export const environment = {
   tvGenreListUrl: baseTMDBUrl + 'genre/tv/list',
   multiSearchUrl: baseTMDBUrl + 'search/multi',
   accessTokenAuth:
-    'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNzRmNDA5YmJjMTExNTY3Yjk5YjYxZmQxMmZkMzFkZSIsInN1YiI6IjYzNGRjZWMyZWY5ZDcyMDA5MTY0ZGEwNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.5YVA4TnXy27q2v70iqdJUCE5WFupBXXiwc8jEzLYkNs',
+    'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZjg0NmZjNzQ0NTFhYjQ5NTZlNDYyMzY5MjY3MTJkYSIsIm5iZiI6MTcyMjYzOTc1Ni45NTQxLCJzdWIiOiI2MzRkY2VjMmVmOWQ3MjAwOTE2NGRhMDciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.u8eENujPod8XnSgZP-wy_xmbZbzBYOBhpPBTlIW-LcE',
   tmdbImageBase: 'https://image.tmdb.org/t/p/original',
   icons: (icon:string, outlined?:boolean | false) => {
     return `/assets/icon/${icon}${outlined ? '-outline':''}.svg`
