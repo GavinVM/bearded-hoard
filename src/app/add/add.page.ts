@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppDataService } from '../service/app-data.service';
-import { map, mergeMap } from 'rxjs';
+import { fromEvent, map, mergeMap, Observable } from 'rxjs';
 import { Entry } from '../model/entry.model';
 import { StorageResponse } from '../model/storage-response.model';
 import { TabsService } from '../service/tabs.service';
@@ -25,6 +25,7 @@ export class AddPage implements OnInit{
   isToast!: boolean;
   isActionSheet!: boolean;
   isSeasonDetailsRunning!: boolean;
+  isOnline!: boolean;
 
   results!: any[];
   options!: any[];
@@ -37,6 +38,9 @@ export class AddPage implements OnInit{
   isSaved4k!: Map<string, boolean>;
   isLoadingBluray!: Map<string, boolean>;
   isLoading4k!: Map<string, boolean>;
+
+  onlineEvent!: Observable<Event>;
+  offlineEvent!: Observable<Event>;
 
   @ViewChild('searchBarTextBox') searchbarTextBox!: IonSearchbar;
 
@@ -61,6 +65,7 @@ export class AddPage implements OnInit{
     this.iconBlurayOutline = environment.icons('blu-ray', true);
     this.iconBluray = environment.icons('blu-ray');
     this.isSeasonDetailsRunning = false;
+    this.isOnline = true;
     this.appDataService.savedEventEmittter.subscribe(response => this.handleSavingEvent(response));
     this.tabService.tabChangingEmiter.subscribe(tab => this.tabChange(tab));
     this.appDataService.trackerListEventEmittter.subscribe((trackerList:Entry[]) => {
@@ -79,6 +84,17 @@ export class AddPage implements OnInit{
         }
       ];
     this.appDataService.getTrackerList()
+    fromEvent(window, 'online').subscribe(() => this.setOnlineOfflineStatus(true));
+    fromEvent(window, 'offline').subscribe(() => this.setOnlineOfflineStatus(false))
+  }
+
+  setOnlineOfflineStatus(statusUpdate:boolean){
+    this.isOnline = statusUpdate
+    if(statusUpdate){
+      console.info('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app is online')
+    } else {
+      console.warn('MrTracker.AddPage.ngOnInit.onlineOfflineListener:: app has gone offline')
+    }
   }
 
   tabChange(tab:string){

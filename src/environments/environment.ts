@@ -3,8 +3,6 @@
 // The list of file replacements can be found in `angular.json`.
 
 const baseTMDBUrl: string = 'https://api.themoviedb.org/3/';
-// const api: string = 'https://4gsgpp-8081.csb.app/api/';
-const api: string = 'http://localhost:8081/api/';
 const cexSearchApiBase: string = 'https://search.webuy.io/1/indexes/prod_cex_uk';
 
 export const environment = {
@@ -17,8 +15,7 @@ export const environment = {
   tvGenreListUrl: baseTMDBUrl + 'genre/tv/list',
   multiSearchUrl: baseTMDBUrl + 'search/multi',
   accessTokenAuth:
-    'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNzRmNDA5YmJjMTExNTY3Yjk5YjYxZmQxMmZkMzFkZSIsInN1YiI6IjYzNGRjZWMyZWY5ZDcyMDA5MTY0ZGEwNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.5YVA4TnXy27q2v70iqdJUCE5WFupBXXiwc8jEzLYkNs',
-  apiKeyAuth: 'd74f409bbc111567b99b61fd12fd31de',
+    'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZjg0NmZjNzQ0NTFhYjQ5NTZlNDYyMzY5MjY3MTJkYSIsIm5iZiI6MTcyMjYzOTc1Ni45NTQxLCJzdWIiOiI2MzRkY2VjMmVmOWQ3MjAwOTE2NGRhMDciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.u8eENujPod8XnSgZP-wy_xmbZbzBYOBhpPBTlIW-LcE',
   tmdbImageBase: 'https://image.tmdb.org/t/p/original',
   icons: (icon:string, outlined?:boolean | false) => {
     return `/assets/icon/${icon}${outlined ? '-outline':''}.svg`

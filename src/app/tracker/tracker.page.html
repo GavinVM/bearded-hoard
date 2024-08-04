@@ -1,9 +1,14 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tracker
+      Mr Tracker
     </ion-title>
-    <ion-segment slot="end" (ionChange)="toggleGridListView($event)" [value]="isGrid? 'grid' : 'list'">
+  </ion-toolbar>
+</ion-header>
+@if(!isLoading) {
+<ion-header>
+  <ion-toolbar>
+    <ion-segment slot="start" (ionChange)="toggleGridListView($event)" [value]="isGrid? 'grid' : 'list'">
       <ion-segment-button value="grid">
         <ion-icon name="grid-outline"></ion-icon>
       </ion-segment-button>
@@ -11,33 +16,8 @@
         <ion-icon name="list-outline"></ion-icon>
       </ion-segment-button>
     </ion-segment> 
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  @if(isGrid){
-    <ion-grid>
-      <ion-row>
-        @for(entry of trackerList; track entry.title){
-          <ion-col size="4" size-md="6" size-sm="12">
-            <ion-card>
-              <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
-              <div class="mediaIcons">
-                @for(format of entry.format; track $index){
-                  <img [src]="getMediaTypeIcon(format)" class="mediaIcon"/>
-                }
-              </div>
-              @if(entry.mediaType == 'tv'){
-                <span class="seasonTitle mediaIcon">{{entry.season}}</span>
-              }
-            </ion-card>
-          </ion-col>
-        }
-      </ion-row>
-    </ion-grid>
-  }
-  @else {
-    <ion-toolbar>
+      <img src="/assets/logo/app-iconset/72.png" class="mrtrkIcon">
+    @if (!isGrid) {
       <ion-buttons slot="end">
         @if(isDelete && !isReorder){
           <ion-button id="clearCheckBoxButton"(click)="toggleCheckBoxes()">
@@ -63,7 +43,7 @@
             }
           }
           @else if(!isDelete && isReorder){
-
+  
           }
           @else {
             <ion-icon name="trash-outline"></ion-icon>
@@ -79,15 +59,45 @@
             }
           }
           @else if(!isReorder && isDelete){
-
+  
           }
           @else {
             <ion-icon name="reorder-three-outline"></ion-icon>
           }
         </ion-button>
       </ion-buttons>
-        
-    </ion-toolbar>
+    }
+      
+  </ion-toolbar>
+</ion-header>
+}
+@else {
+  <ion-loading [isOpen]="isLoading" message="Loading List..."></ion-loading>
+}
+
+<ion-content [fullscreen]="true">
+  @if(isGrid){
+    <ion-grid>
+      <ion-row>
+        @for(entry of trackerList; track entry.title){
+          <ion-col size="4" size-md="6" size-sm="12">
+            <ion-card>
+              <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
+              <div class="mediaIcons">
+                @for(format of entry.format; track $index){
+                  <img [src]="getMediaTypeIcon(format)" class="mediaIcon"/>
+                }
+              </div>
+              @if(entry.mediaType == 'tv'){
+                <span class="seasonTitle mediaIcon">{{entry.season}}</span>
+              }
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  }
+  @else {
     <ion-list [inset]="true">
       @if(isDelete){
         @for(entry of trackerList; track entry.title){
@@ -113,7 +123,9 @@
                 {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
                 <ion-note>  {{formatDetail(entry)}}...</ion-note>
               </ion-label>
-              <ion-reorder slot="end"></ion-reorder>
+              <ion-reorder slot="end">
+                <ion-icon name="chevron-expand-outline"></ion-icon>
+              </ion-reorder>
             </ion-item>
           }
         </ion-reorder-group>
