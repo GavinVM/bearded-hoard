@@ -11,7 +11,8 @@ import { fromEvent } from 'rxjs';
 export class TabsPage {
 
   cexOutline!: string;
-  isLandingPage!: boolean
+  isLandingPage!: boolean;
+  largeScreenAjustment!: string;
 
   constructor(private tabService: TabsService) {
     this.cexOutline = environment.icons('cex', true);
@@ -22,14 +23,19 @@ export class TabsPage {
   }
 
   ngOnInit(){
-    console.info(`MrTracker.TabsPage.ngOnInit:: screen width is ${window.screen.width}`)
-    this.setIsLandingPage(window.screen.width, window.screen.height)
-    fromEvent(window, 'resize').subscribe(() => this.setIsLandingPage(window.screen.width, window.screen.height))
+    console.info(`MrTracker.TabsPage.ngOnInit:: starting`)
+    this.adjustlandingPage()
+    fromEvent(window, 'resize').subscribe(() => this.adjustlandingPage())
+    console.info(`MrTracker.TabsPage.ngOnInit:: finishing`)
   }
 
-  setIsLandingPage(screenWidth: number, screenHeight: number){
-    console.info(`MrTracker.TabsPage.setIsLandingPage:: screen width is ${window.screen.width}`)
-    this.isLandingPage = screenWidth >= 1280 && screenHeight >= 1280
+  adjustlandingPage(){
+    console.debug(`MrTracker.TabsPage.setIsLandingPage:: screen width is ${window.screen.width} and hieght is ${window.screen.height}`)
+    console.debug(`MrTracker.TabsPage.setIsLandingPage:: viewport width is ${window.innerWidth} and hieght is ${window.innerHeight}`)
+    this.isLandingPage = window.screen.width >= 1280 && window.screen.height >= 1280
+    this.largeScreenAjustment = window.innerWidth >= 1230 ? 'exampleFrame largeScreenAdjust' : 'exampleFrame'
+
+    console.debug(`MrTracker.TabsPage.setIsLandingPage:: is landing page ${this.isLandingPage} and is large screen ${this.largeScreenAjustment}`)
   }
 
 }

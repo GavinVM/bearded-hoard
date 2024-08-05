@@ -1,1 +1,43 @@
+.exampleFrame{
+    width: 390px;
+    height: 844px;
+    border: 2px solid #0163AA;
+    border-radius: 50px;
+    box-shadow: 10px 10px 30px #444
+}
 
+.largeScreenAdjust{
+    position: relative;
+    top: -10vw;
+}
+
+ion-grid{
+    padding-top: 20px;
+    overflow-y: scroll;
+}
+
+@font-face {
+    font-family: neuropolitical;
+    src:url('/src/assets/neuropolitical.otf')
+}
+
+h1{
+    font-size: 8vw;
+    font-weight: 900;
+    border-bottom: 2px solid #d8dade;
+}
+
+h5{
+    font-size: 4vw;
+    color: #5f5f5f;
+}
+
+p{
+    font-size: 1.5vw;
+    margin-top: 25px;
+    padding: 25px;
+    border: 1px solid #5f5f5f;
+    border-radius: 45px;
+    box-shadow: -10px 10px 20px #444;
+    text-wrap: pretty;
+}

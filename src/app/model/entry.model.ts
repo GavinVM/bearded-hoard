@@ -2,9 +2,14 @@ export interface Entry {
     title: string
     overview: string
     image: string
-    genres: string
+    genres: Genre[]
     apiId: string
     mediaType: string
     season?: string
     format: string[]
+}
+
+interface Genre {
+    id: number
+    name:string
 }

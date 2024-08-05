@@ -1,5 +1,36 @@
 @if(isLandingPage){
-  this is landing page
+  <ion-header>
+    <ion-toolbar>
+      <!-- <ion-title> -->
+        <img src="../assets/logo/app-iconset/48.png" alt="mrtrkIcon">
+      <!-- </ion-title> -->
+    </ion-toolbar>
+  </ion-header>
+  <ion-grid>
+    <ion-row class="ion-align-items-end">
+      <ion-col size-xxl="6" size-xl="7" size-lg="8" size-md="12" size-sm="12" size-sx="12">
+        <h1>MrTracker</h1>
+        <h5>Mobile app</h5>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-xl="1" offset-lg="0" size-xl="6" size-lg="10" size-md="10" size-sm="10" size-sx="12" offset-md="1" class="groupFont">
+        <p>App to tack your Blu-ray&trade;/4K Blu-ray&trade;'s collection, with the intent to not have to rememeber 
+          when you are buying more to grow your collection.
+          <br>
+          Intented to be used as a app on your device, using the add to home page as method of download and will work offline once 
+          titles are saved.
+          <br>
+          <br>
+          If you want to test out on desktop then I suggest using the devtools on your browser to adust screen size, for detail 
+          instruction please search via your engine of choice "devtool toggle device toolbar".
+        </p>
+      </ion-col>
+      <ion-col offset-xl="1" offset-lg="3" offset-md="3" offset-sm="2" offset-xs="1">
+        <iframe src="example" frameborder="0" [class]="largeScreenAjustment"></iframe>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 }
 @else {
   <ion-tabs (ionTabsWillChange)="tabChangeHandler($event)">
