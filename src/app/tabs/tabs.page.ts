@@ -34,17 +34,16 @@ export class TabsPage {
   }
 
   adjustlandingPage(){
-    // console.debug(`MrTracker.TabsPage.setIsLandingPage:: screen width is ${window.screen.width} and hieght is ${window.screen.height}`)
     console.debug(`MrTracker.TabsPage.setIsLandingPage:: viewport width is ${window.innerWidth} and hieght is ${window.innerHeight}`)
     this.isLandingPage = this.checkIfDeviceMobile();
-    // this.isLandingPage = window.screen.width >= 1280 && window.screen.height >= 1280
     this.largeScreenAjustment = window.innerWidth >= 1230 ? 'exampleFrame largeScreenAdjust' : 'exampleFrame'
 
     console.debug(`MrTracker.TabsPage.setIsLandingPage:: is landing page ${this.isLandingPage} and is large screen ${this.largeScreenAjustment}`)
   }
 
   checkIfDeviceMobile(): boolean{
-    console.debug(`MrTracker.TabsPage.setIsLandingPage:: checking if device is mobile,`, this.deviceService.isMobile())
+    console.info(`MrTracker.TabsPage.setIsLandingPage:: checking if device is mobile,`, this.deviceService.isMobile())
+    console.info(`MrTracker.TabsPage.setIsLandingPage:: checking if device is table,`, this.deviceService.isTablet())
     if(this.deviceService.isMobile() || this.deviceService.isTablet()){
       return false
     } else {

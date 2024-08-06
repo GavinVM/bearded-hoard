@@ -16,7 +16,6 @@
         <ion-icon name="list-outline"></ion-icon>
       </ion-segment-button>
     </ion-segment> 
-      <img src="/assets/logo/app-iconset/72.png" class="mrtrkIcon">
     @if (!isGrid) {
       <ion-buttons slot="end">
         @if(isDelete && !isReorder){
@@ -80,7 +79,7 @@
     <ion-grid>
       <ion-row>
         @for(entry of trackerList; track entry.title){
-          <ion-col size="4" size-md="6" size-sm="12">
+          <ion-col size="4" size-md="2" size-sm="2">
             <ion-card>
               <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
               <div class="mediaIcons">
