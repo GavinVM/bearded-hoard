@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { TabsService } from '../service/tabs.service';
 import { environment } from 'src/environments/environment';
 import { fromEvent } from 'rxjs';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
   selector: 'app-tabs',
@@ -14,7 +15,9 @@ export class TabsPage {
   isLandingPage!: boolean;
   largeScreenAjustment!: string;
 
-  constructor(private tabService: TabsService) {
+  constructor(private tabService: TabsService,
+              private deviceService: DeviceDetectorService
+  ) {
     this.cexOutline = environment.icons('cex', true);
   }
 
@@ -25,17 +28,28 @@ export class TabsPage {
   ngOnInit(){
     console.info(`MrTracker.TabsPage.ngOnInit:: starting`)
     this.adjustlandingPage()
+    this.isLandingPage = this.checkIfDeviceMobile()
     fromEvent(window, 'resize').subscribe(() => this.adjustlandingPage())
     console.info(`MrTracker.TabsPage.ngOnInit:: finishing`)
   }
 
   adjustlandingPage(){
-    console.debug(`MrTracker.TabsPage.setIsLandingPage:: screen width is ${window.screen.width} and hieght is ${window.screen.height}`)
+    // console.debug(`MrTracker.TabsPage.setIsLandingPage:: screen width is ${window.screen.width} and hieght is ${window.screen.height}`)
     console.debug(`MrTracker.TabsPage.setIsLandingPage:: viewport width is ${window.innerWidth} and hieght is ${window.innerHeight}`)
-    this.isLandingPage = window.screen.width >= 1280 && window.screen.height >= 1280
+    this.isLandingPage = this.checkIfDeviceMobile();
+    // this.isLandingPage = window.screen.width >= 1280 && window.screen.height >= 1280
     this.largeScreenAjustment = window.innerWidth >= 1230 ? 'exampleFrame largeScreenAdjust' : 'exampleFrame'
 
     console.debug(`MrTracker.TabsPage.setIsLandingPage:: is landing page ${this.isLandingPage} and is large screen ${this.largeScreenAjustment}`)
+  }
+
+  checkIfDeviceMobile(): boolean{
+    console.debug(`MrTracker.TabsPage.setIsLandingPage:: checking if device is mobile,`, this.deviceService.isMobile())
+    if(this.deviceService.isMobile() || this.deviceService.isTablet()){
+      return false
+    } else {
+      return true
+    }
   }
 
 }
