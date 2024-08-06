@@ -15,15 +15,28 @@ ion-grid{
   opacity: 0.8;
 }
 
+
+
 .seasonTitle{
   position: absolute;
   left: 0px;
   bottom: 0px;
   color: white;
   width: 100%;
-  font-size: 5vw;
   font-weight: 600;
   opacity: 0.45;
+}
+
+@media screen and (min-width: 1024px) {
+  .seasonTitle{
+    font-size: 3vw;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  .seasonTitle{
+    font-size: 5vw;
+  }
 }
 
 .mrtrkIcon{

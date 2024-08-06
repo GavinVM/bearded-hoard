@@ -1,0 +1,19 @@
+.ios-notch{
+    display: block;
+    fill: #090a0d;
+    left: 50%;
+    position: absolute;
+    top: 0px;
+    transform: translateX(-50%);
+    width: 165px;
+    z-index: 2;
+}
+
+.exampleTitle{
+    position: absolute;
+    left: 33vw;
+}
+
+.tabsAdjust{
+    padding-bottom: 10px;
+}
