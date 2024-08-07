@@ -103,7 +103,7 @@ export class CexService {
               cexId: hit.boxId,
               cost: hit.sellPrice,
               description: this.formatBoxName(hit.boxName),
-              format: this.convertFormat(hit.categoryFriendlyName)
+              format: this.convertCexCategory(hit.categoryFriendlyName)
             })
           })
           } else {
@@ -115,7 +115,7 @@ export class CexService {
               cexId: hit.boxId,
               cost: hit.sellPrice,
               description: this.formatBoxName(hit.boxName),
-              format: this.convertFormat(hit.categoryFriendlyName)
+              format: this.convertCexCategory(hit.categoryFriendlyName)
             })
           })
           }
@@ -146,10 +146,10 @@ export class CexService {
   }
 
   formatBoxName(boxName:string):string{
-    return boxName.indexOf('(') != -1 ? boxName.substring(0, boxName.indexOf('(')) : boxName;
+    return boxName.indexOf('(') != -1 ? boxName.substring(0, boxName.indexOf('(')).trim() : boxName;
   }
 
-  convertFormat(cexCategory:string):string{
+  convertCexCategory(cexCategory:string):string{
     console.debug(`mrTracker.CexService.convertFormat:: starting with ${cexCategory}`)
     console.debug(`mrTracker.CexService.convertFormat:: flow for disection is - split ${cexCategory.split(/\s/).toString()}, includes ${cexCategory.split(/\s/).includes('4k')}, returned ${cexCategory.split(/\s/).includes('4k') ? '4k' : 'bluray'}`)
     return cexCategory.split(/\s/).indexOf('4K') != -1 ? '4k' : 'Bluray';

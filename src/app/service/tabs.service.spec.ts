@@ -13,4 +13,20 @@ describe('TabsService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
+
+  it('should emit passed in when triggerTabChangingEmmiter is called', () => {
+    service.tabChangingEmiter.subscribe((tabname:string) => {
+      expect(tabname).toEqual('testingTab');
+    })
+
+    service.triggerTabChangingEmmiter('testingTab');
+  })
+
+  it('should emit passed in when triggerTabChangingEmmiter is called', () => {
+    service.tabChangedEmiter.subscribe((tabname:string) => {
+      expect(tabname).toEqual('testingTab');
+    })
+
+    service.triggerTabChangedEmmiter('testingTab');
+  })
 });

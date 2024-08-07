@@ -28,7 +28,6 @@ export class TabsPage {
   ngOnInit(){
     console.info(`MrTracker.TabsPage.ngOnInit:: starting`)
     this.adjustlandingPage()
-    this.isLandingPage = this.checkIfDeviceMobile()
     fromEvent(window, 'resize').subscribe(() => this.adjustlandingPage())
     console.info(`MrTracker.TabsPage.ngOnInit:: finishing`)
   }
