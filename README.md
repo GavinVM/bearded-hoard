@@ -208,7 +208,7 @@ Project Link: [https://github.com/GavinVM/mr-tracker](https://github.com/GavinVM
 [issues-shield]: https://img.shields.io/github/issues/GavinVM/mr-tracker.svg?style=for-the-badge
 [issues-url]: https://github.com/GavinVM/mr-tracker/issues
 [license-shield]: https://img.shields.io/github/license/GavinVM/mr-tracker.svg?style=for-the-badge
-[license-url]: https://github.com/GavinVM/mr-tracker/blob/master/LICENSE.txt
+[license-url]: https://github.com/GavinVM/mr-tracker/blob/master/LICENSE
 [product-screenshot]: images/screenshot.png
 [Firebase.cloud]: https://img.shields.io/badge/Firebase-5f6368?style=for-the-badge&logo=firebase&logoColor=DD2C00
 [Firebase-url]: https://firebase.google.com/
