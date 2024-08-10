@@ -62,7 +62,7 @@ export class CexService {
       })
     )
     .pipe(
-      mergeMap((requestList:any) =>  this.getAllSearchRestults(requestList))
+      mergeMap((requestList:any) =>  this.getAllSearchResults(requestList))
       
       // console.debug('inside mergeMap subscribe called')
     )
@@ -86,7 +86,7 @@ export class CexService {
   });
 }
 
-  getAllSearchRestults(requestList:any){
+  getAllSearchResults(requestList:any){
     return forkJoin((requestList)).pipe(
       mergeMap((forkResults:any) => {
       console.log(`mrTracker.CexService.getAllSearchRestults:: fork results set is`, forkResults)
