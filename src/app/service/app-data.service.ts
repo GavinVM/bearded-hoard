@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { mergeMap, Observable, of, switchMap} from 'rxjs';
+import { mergeMap, Observable, of} from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
@@ -12,6 +12,7 @@ import { CexEntry } from '../model/cex-entry.model';
 const TRACKER_LIST = 'trackerList';
 const CEX_LIST = 'cexList';
 const EXPIRY_DURATION = 604800000;
+const RETRY_LIMIT: number = 10;
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,8 @@ export class AppDataService {
 
   isStorageReady:boolean = false;
   tmdbHeaders: HttpHeaders;
+  retryCount: Map<string, number> = new Map();
+  setTimeoutId: Map<string, any> = new Map();
 
   savedEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
   trackerListEventEmittter: EventEmitter<Entry[]> = new EventEmitter()
@@ -37,7 +40,7 @@ export class AppDataService {
     })
   }
 
-  getSearchResults(searchCriteria: string, kind?: string){
+  getSearchResults(searchCriteria: string, kind?: string): Observable<any>{
     console.info(`mrTracker.AppDataService.getSearchResults:: Starting`)
     let url = kind? kind == 'movie'? environment.movieSearchUrl: environment.tvSearchUrl : environment.multiSearchUrl
     console.info(`mrTracker.AppDataService.getSearchResults:: finishing`)
@@ -48,7 +51,7 @@ export class AppDataService {
         params: { query: searchCriteria}
       });
   }
-  geTvDetailsById(selectionId: string, mediaType?: string, apiSearchResults?: any){
+  geTvDetailsById(selectionId: string, mediaType?: string, apiSearchResults?: any): Observable<any>{
     // console.info('mrTracker.AppDataService.getSearchResults:: passed param - ',selectionId, mediaType, apiSearchResults )
     return mediaType == 'movie' ? of(apiSearchResults) : this.http.get(
       environment.tvDetailsByIdUrl + selectionId,
@@ -57,7 +60,7 @@ export class AppDataService {
       })
   }
   
-  getMovieDetailsById(selectionId: string){
+  getMovieDetailsById(selectionId: string): Observable<any>{
     return this.http.get(
       environment.movieDetailsByIdUrl + selectionId,
       {
@@ -65,7 +68,7 @@ export class AppDataService {
       })
   }
 
-  saveSelection(selection: any){
+  saveSelection(selection: any): void{
     console.info(`mrTracker.AppDataService.saveSelection:: Starting`)
     let details = selection.mediaType === 'tv'? this.geTvDetailsById(selection.id) : this.getMovieDetailsById(selection.id);
     let savingResponce: StorageResponse = {status: false};
@@ -156,7 +159,7 @@ export class AppDataService {
     return this.storageService.setEntry(TRACKER_LIST, tracketList)
   }
 
-  getTrackerList(){
+  getTrackerList(): void{
     this.getList(TRACKER_LIST).then((response:StorageResponse) => {
       if(response.status){
         console.info(`mrTracker.AppDataService.getTrackerList:: storage ready triggering trackerList event`)
@@ -167,15 +170,67 @@ export class AppDataService {
           this.trackerListEventEmittter.emit([])
         } else {
           console.info(`mrTracker.AppDataService.getTrackerList:: storage not ready, retrying in 2 seconds`)
-          setTimeout(() => {
-            this.getTrackerList();
-          }, 2000)
+          // if(this.retryCount.has('getTrackerList')){
+          //   if((this.retryCount.get('getTrackerList') ?? 0) > RETRY_LIMIT){
+          //     console.info(`mrTracker.AppDataService.getTrackerList:: retry limit reached`)
+          //     clearTimeout(this.setTimeoutId.get('getTrackerList'))
+          //     this.retryCount.set('getTrackerList', 0)
+          //     this.setTimeoutId.clear()
+          //     console.error(`mrTracker.AppDataService.getTrackerList:: timeout reached`)
+          //     console.error(`mrTracker.AppDataService.getTrackerList:: storage initialization timeout`)
+          //     return 
+          //   } else {
+          //     console.info(`mrTracker.AppDataService.getTrackerList:: retry count is ${this.retryCount.get('getTrackerList')}`)
+          //     this.retryCount.set('getTrackerList', (this.retryCount.get('getTrackerList') ?? 0) + 1)
+          //   }
+          // } else {
+          //   console.info(`mrTracker.AppDataService.getTrackerList:: retry count is 1`)  
+          //   this.retryCount.set('getTrackerList', 1)
+          // }
+          // let timer = setTimeout(() => {
+          //   console.info(`mrTracker.AppDataService.getTrackerList:: timeout triggered`) 
+          //   this.getTrackerList();
+          // }, 1000)
+          // this.setTimeoutId.set('getTrackerList', timer)
+
+          if(this.handleRetryCount('getTrackerList', () => this.getTrackerList(), 1000)){
+            console.info(`mrTracker.AppDataService.getTrackerList:: retrying in 2 seconds`)
+          } else {
+            console.error(`mrTracker.AppDataService.getTrackerList:: storage initialization timeout`)
+            return
+          }
         }
       }
     });
   }
 
-  async getCexList(){
+  handleRetryCount(method: string, retryFunction: () => void, duration: number = 1000): boolean {
+    if (this.retryCount.has(method)) {
+      if ((this.retryCount.get(method) ?? 0) > RETRY_LIMIT) {
+        console.info(`mrTracker.AppDataService.handleRetryCount:: ${method} retry limit reached`)
+        clearTimeout(this.setTimeoutId.get(method))
+        this.retryCount.set(method, 0)
+        this.setTimeoutId.clear()
+        console.error(`mrTracker.AppDataService.handleRetryCount:: ${method} timeout reached`)
+        console.error(`mrTracker.AppDataService.handleRetryCount:: ${method} storage initialization timeout`)
+        return true
+      } else {
+        console.info(`mrTracker.AppDataService.handleRetryCount:: ${method} retry count is ${this.retryCount.get(method)}`)
+        this.retryCount.set(method, (this.retryCount.get(method) ?? 0) + 1)
+      }
+    } else {
+      console.info(`mrTracker.AppDataService.handleRetryCount:: ${method} retry count is 1`)  
+      this.retryCount.set(method, 1)
+    }
+    let timer = setTimeout(() => {
+      console.info(`mrTracker.AppDataService.handleRetryCount:: ${method} ${(duration/1000)} second(s) timeout triggered`) 
+      retryFunction()
+    }, duration)
+    this.setTimeoutId.set(method, timer)
+    return true;
+  }
+
+  getCexList(): void{
     console.info(`mrTracker.AppDataService.getCexList:: Starting`) 
     this.getList(CEX_LIST).then((storageResponse:StorageResponse) =>{
       console.debug(`mrTracker.AppDataService.getCexList:: processing respose from getList() - `, storageResponse)
@@ -184,6 +239,7 @@ export class AppDataService {
         let cexResults: CexResults = storageResponse.item
         if(this.sessionValid(cexResults.expiry)){
           console.info(`mrTracker.AppDataService.getCexList:: session is valid`)
+          console.debug(`mrTracker.AppDataService.getCexList:: emitting cexList`, cexResults.cexList)
           this.cexListReadyEmitter.emit(cexResults.cexList)
         } else {
           console.info(`mrTracker.AppDataService.getCexList:: session expired, updating list`)
@@ -194,15 +250,41 @@ export class AppDataService {
           console.info(`mrTracker.AppDataService.getCexList:: storage is ready updating list`)
            this.cexService.updateList()
         } else {
-          console.info(`mrTracker.AppDataService.getCexList:: storage is pending, waiting 2 seconds`)
-          setTimeout(() => {this.getCexList()}, 1000)
+          console.info(`mrTracker.AppDataService.getCexList:: storage is pending, waiting 1 seconds`)
+          // if(this.retryCount.has('getCexList')){
+          //   if((this.retryCount.get('getCexList') ?? 0) > RETRY_LIMIT){
+          //     console.info(`mrTracker.AppDataService.getCexList:: getCexList retry limit reached`)
+          //     clearTimeout(this.setTimeoutId.get('getCexList'))
+          //     this.retryCount.set('getCexList', 0)
+          //     this.setTimeoutId.clear()
+          //     console.error(`mrTracker.AppDataService.getCexList:: getCexList timeout reached`)
+          //     console.error(`mrTracker.AppDataService.getCexList:: storage initialization timeout`)
+          //     return 
+          //   } else {
+          //     console.info(`mrTracker.AppDataService.getCexList:: getCexList retry count is ${this.retryCount.get('getCexList')}`)
+          //     this.retryCount.set('getCexList', (this.retryCount.get('getCexList') ?? 0) + 1)
+          //   }
+          // } else {
+          //   console.info(`mrTracker.AppDataService.getCexList:: getCexList retry count is 1`)  
+          //   this.retryCount.set('getCexList', 1)
+          // }
+          // let timer = setTimeout(() => {
+          //   console.info(`mrTracker.AppDataService.getCexList:: getCexList timeout triggered`) 
+          //   this.getCexList();
+          // }, 2000)
+          // this.setTimeoutId.set('getCexList', timer)
+          if(this.handleRetryCount('getCexList', () => this.getCexList(), 2000)){
+            console.info(`mrTracker.AppDataService.getCexList:: retrying...`)
+          } else {
+            console.error(`mrTracker.AppDataService.getCexList:: storage initialization timeout`)
+            return
+          }
         }
       }
-    });
-    console.info(`mrTracker.AppDataService.getCexList:: finishing`) 
+    });    
   }
 
-  sessionValid(expiry: Date){  
+  sessionValid(expiry: Date): boolean{
     console.log(`mrTracker.AppDataService.sessionValid:: validating session`)
     console.debug(`mrTracker.AppDataService.sessionValid:: expected difference is ${EXPIRY_DURATION} but got ${(Date.parse(new Date().toISOString()) - Date.parse(expiry.toISOString()))}`)
     console.debug(`mrTracker.AppDataService.sessionValid:: dates before parse are `, expiry,new Date())
@@ -211,6 +293,8 @@ export class AppDataService {
   }
 
   getList(list:string){
+    console.info(`mrTracker.AppDataService.getList:: starting`)
+    console.info(`mrTracker.AppDataService.getList:: getting list ${list}`)
     return this.isStorageReady ? this.storageService.getEntry(list) : new Promise<StorageResponse>(resolve => resolve({status: false}))
   }
 

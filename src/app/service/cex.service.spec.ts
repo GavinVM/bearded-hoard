@@ -5,7 +5,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { StorageService } from './storage.service';
 
-fdescribe('CexService', () => {
+describe('CexService', () => {
   let service: CexService;
   let httpMock: HttpTestingController;
   let httpClient: HttpClient;
@@ -95,8 +95,4 @@ fdescribe('CexService', () => {
     expect(req.request.method).toBe('GET');
     req.flush(results);
   });
-
-  it('should call the updateList method and return list of results', async() => {
-
-  })
 });
