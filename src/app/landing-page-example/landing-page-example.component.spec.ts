@@ -1,24 +1,12 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
-
 import { LandingPageExampleComponent } from './landing-page-example.component';
+import { MockBuilder, MockRender } from 'ng-mocks';
+import { LandingPageExampleModule } from './landing-page-example.module';
 
 describe('LandingPageExampleComponent', () => {
-  let component: LandingPageExampleComponent;
-  let fixture: ComponentFixture<LandingPageExampleComponent>;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ LandingPageExampleComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(LandingPageExampleComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  }));
+  beforeEach( () => MockBuilder(LandingPageExampleComponent, LandingPageExampleModule));
 
   it('should create', () => {
+    const component = MockRender(LandingPageExampleComponent).point.componentInstance;
     expect(component).toBeTruthy();
   });
 });

@@ -5,7 +5,7 @@ import { AppDataService } from '../service/app-data.service';
 import { EventEmitter } from '@angular/core';
 import { TabsService } from '../service/tabs.service';
 
-fdescribe('TrackerPage', () => {
+describe('TrackerPage', () => {
 
   beforeEach( () => MockBuilder(TrackerPage, TrackerPageModule));
 
@@ -525,5 +525,55 @@ fdescribe('TrackerPage', () => {
     afterEach(MockInstance.restore);
   })
 
+  describe('loadTrackerList', () => {
+    beforeEach(() => {
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>()
+      }));
+
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+    });
+
+    beforeEach(MockInstance.remember);
+
+    it('should set tracker list', () => {
+      const component = MockRender(TrackerPage);
+      component.detectChanges();
+
+      const exampleTrackerList = [
+        {
+          mediaType: 'movie',
+          apiId: '1',
+          format: ['blu-ray'],
+          title: 'test',
+          image: 'test',
+          overview: 'test',
+          genres: [{name: 'test',id: 1}]
+        },
+        {
+          mediaType: 'movie',
+          apiId: '2',
+          format: ['blu-ray'],
+          title: 'test',
+          image: 'test',
+          overview: 'test',
+          genres: [{name: 'test',id: 1}]
+        }
+      ]
+
+      component.point.componentInstance.trackerList = [];
+
+      expect(component.point.componentInstance.trackerList.length).toEqual(0);
+      component.point.componentInstance.loadTrackerList(exampleTrackerList);
+      expect(component.point.componentInstance.isLoading).toBeFalse();
+      expect(component.point.componentInstance.trackerList.length).toEqual(2);
+      
+    })
+
+    afterEach(MockInstance.restore);
+  })
 
 });

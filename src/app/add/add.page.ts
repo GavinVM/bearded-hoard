@@ -32,7 +32,7 @@ export class AddPage implements OnInit{
   existingEntryData!: {id:string, format:string};
   currentTrackerList!: Entry[];
   seasonsDetails!: any
-  removeExistingEtryActionSheetButtons!: any;
+  removeExistingEntryActionSheetButtons!: any;
 
   isSavedBluray!: Map<string, boolean>;
   isSaved4k!: Map<string, boolean>;
@@ -74,7 +74,7 @@ export class AddPage implements OnInit{
       this.currentTrackerList = trackerList;
       console.info(`MrTracker.AddPage.ngOnInit.trackerListEventEmitter:: handeled`)
     })
-    this.removeExistingEtryActionSheetButtons = [
+    this.removeExistingEntryActionSheetButtons = [
         {
           text: 'Continue',
           role: 'cancel',

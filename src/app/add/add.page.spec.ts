@@ -1,26 +1,221 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
-
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
+import { IonicModule, ToastController } from '@ionic/angular';
 
 import { AddPage } from './add.page';
+import { AddPageModule } from './add.module';
+import { MockBuilder, MockInstance, MockRender } from 'ng-mocks';
+import { AppDataService } from '../service/app-data.service';
+import { EventEmitter } from '@angular/core';
+import { TabsService } from '../service/tabs.service';
+import { of } from 'rxjs';
 
-describe('AddPage', () => {
-  let component: AddPage;
-  let fixture: ComponentFixture<AddPage>;
+fdescribe('AddPage', () => {
+  beforeEach( () => MockBuilder(AddPage, AddPageModule));
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [AddPage],
-      imports: [IonicModule.forRoot(), ExploreContainerComponentModule]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(AddPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  beforeEach(() => MockInstance.remember);
 
   it('should create', () => {
+
+    MockInstance(AppDataService, () => ({
+      getTrackerList: jasmine.createSpy(),
+      trackerListEventEmittter: new EventEmitter<any>(),
+      savedEventEmittter: new EventEmitter<any>()
+    }));
+
+    MockInstance(TabsService, () => ({
+      tabChangingEmiter: new EventEmitter<any>()
+    }))
+
+    MockInstance(ToastController, () => ({
+      create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
+      present: jasmine.createSpy()
+    }))
+
+    const component = MockRender(AddPage).point.componentInstance;
     expect(component).toBeTruthy();
   });
+
+  afterEach(MockInstance.restore);
+
+  describe('setOnlineOfflineStatus', () => {
+
+    beforeEach(() => {
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>()
+      }));
+  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
+        present: jasmine.createSpy()
+      }))
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    it('should set online', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      component.point.componentInstance.isOnline = false;
+      const setOnlineOfflineStatusSpy = spyOn(component.point.componentInstance, 'setOnlineOfflineStatus');
+      
+      window.dispatchEvent(new Event('online'));
+
+      
+      expect(setOnlineOfflineStatusSpy).toHaveBeenCalledWith(true);
+    })
+
+    it('should set offline', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      component.point.componentInstance.isOnline = false;
+      const setOnlineOfflineStatusSpy = spyOn(component.point.componentInstance, 'setOnlineOfflineStatus');
+      
+      window.dispatchEvent(new Event('offline'));
+
+      
+      expect(setOnlineOfflineStatusSpy).toHaveBeenCalledWith(false);
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
+  describe('tabChange', () => {
+
+    beforeEach(() => {
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>()
+      }));
+  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
+        present: jasmine.createSpy()
+      }))
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    it('should setup tab for fresh search', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      component.point.componentInstance.options = ['test']
+      component.point.componentInstance.searchbarTextBox.value = 'test';
+      
+      
+      component.point.componentInstance.tabChange('other');
+      expect(component.point.componentInstance.options.length).toBe(0);
+      expect(component.point.componentInstance.searchbarTextBox.value).toBe('');
+    })
+
+    it('should do nothing', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      component.point.componentInstance.options = ['test']
+      component.point.componentInstance.searchbarTextBox.value = 'test';
+      
+      
+      component.point.componentInstance.tabChange('add');
+      expect(component.point.componentInstance.options.length).toBe(1);
+      expect(component.point.componentInstance.searchbarTextBox.value).toBe('test');
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
+  fdescribe('getResults', () => {
+
+    beforeEach(() => {  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
+        present: jasmine.createSpy()
+      }))
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    fit('should set results', () => {
+
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>(),
+        getSearchResults: jasmine.createSpy().and.returnValue(of({results: [
+          {
+            id: '1',
+            media_type: 'movie',
+          }
+        ]})),
+        geTvDetailsById: jasmine.createSpy().and.returnValue(of({
+          title: 'test',
+          id: '1',
+          media_type: 'movie',
+          release_date: '1999-10-15',
+        }))
+      }));
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const optionsExample = {
+        id: 1,
+        title: 'test',
+        mediaType: 'movie',
+        releaseDate: '1999'
+      }
+      
+      const AppDataServiceMock = component.point.injector.get(AppDataService);
+
+      const eventMock = {
+        target: {
+          value: 'test'
+        }
+      }
+      
+      component.point.componentInstance.getResults(eventMock);
+      expect(AppDataServiceMock.getSearchResults).toHaveBeenCalledWith('test');
+      expect(AppDataServiceMock.geTvDetailsById).toHaveBeenCalledWith('1', 'movie', {id: '1',
+        media_type: 'movie'});
+      
+    })
+
+    it('should do nothing', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      component.point.componentInstance.options = ['test']
+      component.point.componentInstance.searchbarTextBox.value = 'test';
+      
+      
+      component.point.componentInstance.tabChange('add');
+      expect(component.point.componentInstance.options.length).toBe(1);
+      expect(component.point.componentInstance.searchbarTextBox.value).toBe('test');
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
 });
