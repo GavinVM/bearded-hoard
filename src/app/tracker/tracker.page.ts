@@ -99,7 +99,8 @@ export class TrackerPage implements OnInit{
 
   formatDetail(entry: Entry): string{
     let detailLength = entry.title.length > 15 ? 15 : 20; 
-    return entry.overview.substring(0, entry.overview.indexOf(' ', detailLength))
+    let endPoint = entry.overview.indexOf(' ', detailLength) > 0 ? entry.overview.indexOf(' ', detailLength) : 20
+    return entry.overview.substring(0, endPoint)
   }
 
   toggleCheckBoxes(){
@@ -157,12 +158,17 @@ export class TrackerPage implements OnInit{
   }
 
   deleteEntries(confirm:boolean){
+    console.info(`mrTracker.TrackerPage.deleteEntries:: starting with confirm status - ${confirm}`)
     if(!confirm){
+      console.info(`mrTracker.TrackerPage.deleteEntries:: closing the delete view`)
       this.isModalOpen = false;
     } else {
+      console.info(`mrTracker.TrackerPage.deleteEntries:: removing entries from list`)
       this.isLoading = true;
       this.trackerList = this.trackerList.filter((entry:Entry) => this.deleteEntryList.indexOf(entry.apiId) == -1)
+      console.info(`mrTracker.TrackerPage.deleteEntries:: entries removed, removed list looks like -`, this.removeEntryList)
       this.appDataService.updateTrackerList(this.trackerList).then((response:StorageResponse) => {
+        console.info(`mrTracker.TrackerPage.deleteEntries.updateTrackerList:: response - `, response)
         if(response.status){
           this.toastMessage = 'Entries removed successfully';
           this.isGrid = true;
@@ -176,6 +182,7 @@ export class TrackerPage implements OnInit{
         } else {
           this.toastMessage = 'Error deleting , please try again';
         }
+        console.info(`mrTracker.TrackerPage.deleteEntries.updateTrackerList:: complete, closing modal`)
         this.isModalOpen = false;
       })
 
@@ -234,6 +241,7 @@ export class TrackerPage implements OnInit{
   }
 
   getMediaTypeIcon(mediaType:string): string{
+    console.debug(`mrTracker.TrackerPage.getMediaTypeIcon:: getting icon for ${mediaType}`)
     switch(mediaType){
       case 'bluray':
         return environment.icons('blu-ray');

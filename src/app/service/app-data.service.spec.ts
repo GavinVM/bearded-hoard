@@ -26,7 +26,7 @@ import { EventEmitter } from '@angular/core';
 import { CexEntry } from '../model/cex-entry.model';
 import { Entry } from '../model/entry.model';
 
-fdescribe('AppDataService', () => {
+describe('AppDataService', () => {
 
   describe('getList', () => {
     // const storageReadyEmitterMock = new EventEmitter<boolean>();

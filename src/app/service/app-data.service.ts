@@ -170,29 +170,6 @@ export class AppDataService {
           this.trackerListEventEmittter.emit([])
         } else {
           console.info(`mrTracker.AppDataService.getTrackerList:: storage not ready, retrying in 2 seconds`)
-          // if(this.retryCount.has('getTrackerList')){
-          //   if((this.retryCount.get('getTrackerList') ?? 0) > RETRY_LIMIT){
-          //     console.info(`mrTracker.AppDataService.getTrackerList:: retry limit reached`)
-          //     clearTimeout(this.setTimeoutId.get('getTrackerList'))
-          //     this.retryCount.set('getTrackerList', 0)
-          //     this.setTimeoutId.clear()
-          //     console.error(`mrTracker.AppDataService.getTrackerList:: timeout reached`)
-          //     console.error(`mrTracker.AppDataService.getTrackerList:: storage initialization timeout`)
-          //     return 
-          //   } else {
-          //     console.info(`mrTracker.AppDataService.getTrackerList:: retry count is ${this.retryCount.get('getTrackerList')}`)
-          //     this.retryCount.set('getTrackerList', (this.retryCount.get('getTrackerList') ?? 0) + 1)
-          //   }
-          // } else {
-          //   console.info(`mrTracker.AppDataService.getTrackerList:: retry count is 1`)  
-          //   this.retryCount.set('getTrackerList', 1)
-          // }
-          // let timer = setTimeout(() => {
-          //   console.info(`mrTracker.AppDataService.getTrackerList:: timeout triggered`) 
-          //   this.getTrackerList();
-          // }, 1000)
-          // this.setTimeoutId.set('getTrackerList', timer)
-
           if(this.handleRetryCount('getTrackerList', () => this.getTrackerList(), 1000)){
             console.info(`mrTracker.AppDataService.getTrackerList:: retrying in 2 seconds`)
           } else {
@@ -251,28 +228,6 @@ export class AppDataService {
            this.cexService.updateList()
         } else {
           console.info(`mrTracker.AppDataService.getCexList:: storage is pending, waiting 1 seconds`)
-          // if(this.retryCount.has('getCexList')){
-          //   if((this.retryCount.get('getCexList') ?? 0) > RETRY_LIMIT){
-          //     console.info(`mrTracker.AppDataService.getCexList:: getCexList retry limit reached`)
-          //     clearTimeout(this.setTimeoutId.get('getCexList'))
-          //     this.retryCount.set('getCexList', 0)
-          //     this.setTimeoutId.clear()
-          //     console.error(`mrTracker.AppDataService.getCexList:: getCexList timeout reached`)
-          //     console.error(`mrTracker.AppDataService.getCexList:: storage initialization timeout`)
-          //     return 
-          //   } else {
-          //     console.info(`mrTracker.AppDataService.getCexList:: getCexList retry count is ${this.retryCount.get('getCexList')}`)
-          //     this.retryCount.set('getCexList', (this.retryCount.get('getCexList') ?? 0) + 1)
-          //   }
-          // } else {
-          //   console.info(`mrTracker.AppDataService.getCexList:: getCexList retry count is 1`)  
-          //   this.retryCount.set('getCexList', 1)
-          // }
-          // let timer = setTimeout(() => {
-          //   console.info(`mrTracker.AppDataService.getCexList:: getCexList timeout triggered`) 
-          //   this.getCexList();
-          // }, 2000)
-          // this.setTimeoutId.set('getCexList', timer)
           if(this.handleRetryCount('getCexList', () => this.getCexList(), 2000)){
             console.info(`mrTracker.AppDataService.getCexList:: retrying...`)
           } else {
