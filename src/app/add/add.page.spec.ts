@@ -137,11 +137,38 @@ fdescribe('AddPage', () => {
       expect(component.point.componentInstance.searchbarTextBox.value).toBe('test');
     })
 
+    it('should tabChange called from event', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      
+      const tabServiceMock = component.point.injector.get(TabsService);
+      const tabChangeSpy = spyOn(component.point.componentInstance, 'tabChange');
+      
+      
+      tabServiceMock.tabChangingEmiter.emit('test');
+      expect(tabChangeSpy).toHaveBeenCalledWith('test');
+    })
+
+    it('should call app data service getTrackList when tab name is add', () => {
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      
+      const tabServiceMock = component.point.injector.get(TabsService);
+      const appDataServiceMock = component.point.injector.get(AppDataService);
+      const tabChangeSpy = spyOn(component.point.componentInstance, 'tabChange');
+      
+      
+      tabServiceMock.tabChangingEmiter.emit('add');
+      expect(appDataServiceMock.getTrackerList).toHaveBeenCalled();
+    })
+
     afterEach(MockInstance.restore);
 
   });
 
-  fdescribe('getResults', () => {
+  describe('getResults', () => {
 
     beforeEach(() => {  
       MockInstance(TabsService, () => ({
@@ -157,7 +184,7 @@ fdescribe('AddPage', () => {
 
     beforeEach(() => MockInstance.remember);
 
-    fit('should set results', () => {
+    it('should set results', () => {
 
       MockInstance(AppDataService, () => ({
         getTrackerList: jasmine.createSpy(),
@@ -212,6 +239,68 @@ fdescribe('AddPage', () => {
       component.point.componentInstance.tabChange('add');
       expect(component.point.componentInstance.options.length).toBe(1);
       expect(component.point.componentInstance.searchbarTextBox.value).toBe('test');
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
+  fdescribe('formatResultsForTvSeasons', () => {
+
+    beforeEach(() => {  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
+        present: jasmine.createSpy()
+      }))
+
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>(),
+      }));
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    it('should return array of details from input', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const inputExample = {
+        id: 1,
+        name: 'test',
+        seasons: {
+          name: 'season-1',
+          air_date: '2010-12-05'
+        }
+      }
+
+      const outputExample = [
+        {
+          title: 'test',
+          season: 'season-1',
+          id: 1,
+          mediaType: 'tv', 
+          releaseYear: '2010'
+        },
+        {
+          title: 'test',
+          season: 'box-set',
+          id: 1,
+          mediaType: 'tv', 
+          releaseYear: '2010'
+        }
+      ]
+      
+      expect(component.point.componentInstance.formatResultsForTvSeasons(inputExample)).toEqual(outputExample);
+      
     })
 
     afterEach(MockInstance.restore);
