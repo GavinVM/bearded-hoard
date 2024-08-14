@@ -245,7 +245,7 @@ fdescribe('AddPage', () => {
 
   });
 
-  fdescribe('formatResultsForTvSeasons', () => {
+  describe('formatResultsForTvSeasons', () => {
 
     beforeEach(() => {  
       MockInstance(TabsService, () => ({
@@ -300,6 +300,383 @@ fdescribe('AddPage', () => {
       ]
       
       expect(component.point.componentInstance.formatResultsForTvSeasons(inputExample)).toEqual(outputExample);
+      
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
+  describe('handleSelection', () => {
+
+    beforeEach(() => {  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
+        present: jasmine.createSpy()
+      }))
+
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        saveSelection: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>(),
+      }));
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    it('should update loading and saved state for 4k, when saveState is true', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+
+      const selection = {
+        id: '1',
+        name: 'test',
+        formate: ''
+      }
+
+      const AppDataServiceMock = component.point.injector.get(AppDataService);
+
+      component.point.componentInstance.handleSelection(selection, true, '4k');
+      
+      expect(AppDataServiceMock.saveSelection).toHaveBeenCalledWith(selection);
+      expect(component.point.componentInstance.isLoading4k.get(selection.id)).toBeTrue();
+      expect(component.point.componentInstance.isSaved4k.get(selection.id)).toBeTrue();
+      expect(component.point.componentInstance.isLoadingBluray.size).toEqual(0);
+      expect(component.point.componentInstance.isSavedBluray.size).toEqual(0);
+      expect(component.point.componentInstance.currentFormat).toEqual('4k');
+      
+    })
+
+    it('should update loading and saved state for bluray, when saveState is true', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+
+      const selection = {
+        id: '1',
+        name: 'test',
+        formate: ''
+      }
+
+      const AppDataServiceMock = component.point.injector.get(AppDataService);
+
+      component.point.componentInstance.handleSelection(selection, true, 'bluray');
+      
+      expect(AppDataServiceMock.saveSelection).toHaveBeenCalledWith(selection);
+      expect(component.point.componentInstance.isLoadingBluray.get(selection.id)).toBeTrue();
+      expect(component.point.componentInstance.isSavedBluray.get(selection.id)).toBeTrue();
+      expect(component.point.componentInstance.isLoading4k.size).toEqual(0);
+      expect(component.point.componentInstance.isSaved4k.size).toEqual(0);
+      expect(component.point.componentInstance.currentFormat).toEqual('bluray');
+      
+    })
+
+    it('should update loading and saved state for 4k, when saveState is false', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+
+      const selection = {
+        id: '1',
+        name: 'test',
+        formate: ''
+      }
+
+      component.point.componentInstance.currentTrackerList = [
+        {
+          title: 'test',
+          season: 'box-set',
+          apiId: '1',
+          mediaType: 'tv', 
+          format: ['4k'],
+          genres: [],
+          image: '',
+          overview: '',
+        }
+      ]
+
+      const AppDataServiceMock = component.point.injector.get(AppDataService);
+      const toastSpy = spyOn(component.point.componentInstance, 'createToast');
+
+      component.point.componentInstance.handleSelection(selection, false, '4k');
+      
+      expect(AppDataServiceMock.saveSelection).not.toHaveBeenCalled();
+      expect(component.point.componentInstance.isLoading4k.get(selection.id)).toBeFalse();
+      expect(component.point.componentInstance.isSaved4k.get(selection.id)).toBeTrue();
+      expect(component.point.componentInstance.isLoadingBluray.size).toEqual(0);
+      expect(component.point.componentInstance.isSavedBluray.size).toEqual(0);
+      expect(toastSpy).toHaveBeenCalledWith('Entry Already Exists', 'warning');
+      
+    })
+
+    it('should update loading and saved state for bluray, when saveState is false', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+
+      const selection = {
+        id: '1',
+        name: 'test',
+        formate: ''
+      }
+
+      component.point.componentInstance.currentTrackerList = [
+        {
+          title: 'test',
+          season: 'box-set',
+          apiId: '1',
+          mediaType: 'tv', 
+          format: ['4k'],
+          genres: [],
+          image: '',
+          overview: '',
+        }
+      ]
+
+      const AppDataServiceMock = component.point.injector.get(AppDataService);
+      const toastSpy = spyOn(component.point.componentInstance, 'createToast');
+
+      component.point.componentInstance.handleSelection(selection, false, 'bluray');
+      
+      expect(AppDataServiceMock.saveSelection).not.toHaveBeenCalled();
+      expect(component.point.componentInstance.isLoadingBluray.get(selection.id)).toBeFalse();
+      expect(component.point.componentInstance.isSavedBluray.get(selection.id)).toBeTrue();
+      expect(component.point.componentInstance.isLoading4k.size).toEqual(0);
+      expect(component.point.componentInstance.isSaved4k.size).toEqual(0);
+      expect(toastSpy).toHaveBeenCalledWith('Entry Already Exists', 'warning');
+      
+    })
+
+    it('should display error toast when saveState is false and Current tracker list is empty', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+
+      const selection = {
+        id: '1',
+        name: 'test',
+        formate: ''
+      }
+
+      component.point.componentInstance.currentTrackerList = [
+        {
+          title: 'test',
+          season: 'box-set',
+          apiId: '2',
+          mediaType: 'tv', 
+          format: ['4k'],
+          genres: [],
+          image: '',
+          overview: '',
+        }
+      ]
+
+      const AppDataServiceMock = component.point.injector.get(AppDataService);
+      const toastSpy = spyOn(component.point.componentInstance, 'createToast');
+
+      component.point.componentInstance.handleSelection(selection, false, 'bluray');
+      
+      expect(AppDataServiceMock.saveSelection).not.toHaveBeenCalled();
+      expect(toastSpy).toHaveBeenCalledWith('Error, clear search and try again.', 'danger');
+      
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
+  describe('createToast', () => {
+
+    beforeEach(() => {  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({}))
+      }))
+
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>(),
+      }));
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    it('should create message with default color as none is passed', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const toastSpy = component.point.injector.get(ToastController);
+
+      component.point.componentInstance.createToast('test message');
+      
+      expect(toastSpy.create).toHaveBeenCalledWith({
+        message: 'test message',
+        duration: 3000,
+        color: 'default'
+      })
+      
+    })
+
+    it('should create message with danger color which is passed', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const toastSpy = component.point.injector.get(ToastController);
+
+      component.point.componentInstance.createToast('test message', 'danger');
+      
+      expect(toastSpy.create).toHaveBeenCalledWith({
+        message: 'test message',
+        duration: 3000,
+        color: 'danger'
+      })
+      
+    })
+
+    afterEach(MockInstance.restore);
+
+  });
+
+  fdescribe('handleSavingEvent', () => {
+
+    beforeEach(() => {  
+      MockInstance(TabsService, () => ({
+        tabChangingEmiter: new EventEmitter<any>()
+      }))
+  
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({}))
+      }))
+
+      MockInstance(AppDataService, () => ({
+        getTrackerList: jasmine.createSpy(),
+        trackerListEventEmittter: new EventEmitter<any>(),
+        savedEventEmittter: new EventEmitter<any>(),
+      }));
+    
+    })
+
+    beforeEach(() => MockInstance.remember);
+
+    it('should create success toast and get new tracker list and stop loading for 4k', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const toastSpy = component.point.injector.get(ToastController);
+      const appDataServiceSpy = component.point.injector.get(AppDataService);
+
+      const selectionResponse = {
+        status: true,
+        item:{
+          title: 'test',
+          apiId: '2'
+        }
+      }
+
+      component.point.componentInstance.isLoading4k.set(selectionResponse.item.apiId, true);
+      component.point.componentInstance.currentFormat = '4k';
+      component.point.componentInstance.handleSavingEvent(selectionResponse);
+      
+      expect(toastSpy.create).toHaveBeenCalledWith({
+        message: 'test was saved in 4k',
+        duration: 3000,
+        color: 'success'
+      })
+      expect(appDataServiceSpy.getTrackerList).toHaveBeenCalled();
+      expect(component.point.componentInstance.isLoading4k.get(selectionResponse.item.apiId)).toBeFalse();
+      expect(component.point.componentInstance.currentFormat).toBe('');
+
+    })
+
+    it('should create success toast and get new tracker list and stop loading for bluray', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const toastSpy = component.point.injector.get(ToastController);
+      const appDataServiceSpy = component.point.injector.get(AppDataService);
+
+      const selectionResponse = {
+        status: true,
+        item:{
+          title: 'test',
+          apiId: '2'
+        }
+      }
+
+      component.point.componentInstance.isLoadingBluray.set(selectionResponse.item.apiId, true);
+      component.point.componentInstance.currentFormat = 'bluray';
+      component.point.componentInstance.handleSavingEvent(selectionResponse);
+      
+      expect(toastSpy.create).toHaveBeenCalledWith({
+        message: 'test was saved in bluray',
+        duration: 3000,
+        color: 'success'
+      })
+      expect(appDataServiceSpy.getTrackerList).toHaveBeenCalled();
+      expect(component.point.componentInstance.isLoadingBluray.get(selectionResponse.item.apiId)).toBeFalse();
+      expect(component.point.componentInstance.currentFormat).toBe('');
+      
+    })
+
+    it('should create error toast', () => {
+
+      
+
+      const component = MockRender(AddPage);
+      component.detectChanges();
+      const toastSpy = component.point.injector.get(ToastController);
+      const appDataServiceSpy = component.point.injector.get(AppDataService);
+
+      const selectionResponse = {
+        status: false,
+        item:{
+          title: 'test',
+          apiId: '2'
+        }
+      }
+
+      component.point.componentInstance.isLoadingBluray.set(selectionResponse.item.apiId, true);
+      component.point.componentInstance.currentFormat = 'bluray';
+      component.point.componentInstance.handleSavingEvent(selectionResponse);
+      
+      expect(toastSpy.create).toHaveBeenCalledWith({
+        message: 'Error in saving, clear search and try again.',
+        duration: 3000,
+        color: 'danger'
+      })
+      
+      expect(component.point.componentInstance.isLoadingBluray.get(selectionResponse.item.apiId)).toBeFalse();
+      expect(component.point.componentInstance.currentFormat).toBe('');
       
     })
 
