@@ -9,7 +9,7 @@ import { EventEmitter } from '@angular/core';
 import { TabsService } from '../service/tabs.service';
 import { of } from 'rxjs';
 
-fdescribe('AddPage', () => {
+describe('AddPage', () => {
   beforeEach( () => MockBuilder(AddPage, AddPageModule));
 
   beforeEach(() => MockInstance.remember);
@@ -27,8 +27,7 @@ fdescribe('AddPage', () => {
     }))
 
     MockInstance(ToastController, () => ({
-      create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
-      present: jasmine.createSpy()
+      create: jasmine.createSpy().and.returnValue(Promise.resolve({}))
     }))
 
     const component = MockRender(AddPage).point.componentInstance;
@@ -52,7 +51,6 @@ fdescribe('AddPage', () => {
   
       MockInstance(ToastController, () => ({
         create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
-        present: jasmine.createSpy()
       }))
     
     })
@@ -104,7 +102,6 @@ fdescribe('AddPage', () => {
   
       MockInstance(ToastController, () => ({
         create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
-        present: jasmine.createSpy()
       }))
     
     })
@@ -177,7 +174,6 @@ fdescribe('AddPage', () => {
   
       MockInstance(ToastController, () => ({
         create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
-        present: jasmine.createSpy()
       }))
     
     })
@@ -254,7 +250,6 @@ fdescribe('AddPage', () => {
   
       MockInstance(ToastController, () => ({
         create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
-        present: jasmine.createSpy()
       }))
 
       MockInstance(AppDataService, () => ({
@@ -276,10 +271,11 @@ fdescribe('AddPage', () => {
       const inputExample = {
         id: 1,
         name: 'test',
-        seasons: {
+        seasons: [{
           name: 'season-1',
           air_date: '2010-12-05'
-        }
+        }],
+        first_air_date: '2010-12-05'
       }
 
       const outputExample = [
@@ -292,7 +288,7 @@ fdescribe('AddPage', () => {
         },
         {
           title: 'test',
-          season: 'box-set',
+          season: 'Box Set',
           id: 1,
           mediaType: 'tv', 
           releaseYear: '2010'
@@ -316,7 +312,6 @@ fdescribe('AddPage', () => {
   
       MockInstance(ToastController, () => ({
         create: jasmine.createSpy().and.returnValue(Promise.resolve({})),
-        present: jasmine.createSpy()
       }))
 
       MockInstance(AppDataService, () => ({
@@ -563,7 +558,7 @@ fdescribe('AddPage', () => {
 
   });
 
-  fdescribe('handleSavingEvent', () => {
+  describe('handleSavingEvent', () => {
 
     beforeEach(() => {  
       MockInstance(TabsService, () => ({
@@ -674,7 +669,7 @@ fdescribe('AddPage', () => {
         duration: 3000,
         color: 'danger'
       })
-      
+
       expect(component.point.componentInstance.isLoadingBluray.get(selectionResponse.item.apiId)).toBeFalse();
       expect(component.point.componentInstance.currentFormat).toBe('');
       

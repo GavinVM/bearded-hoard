@@ -184,7 +184,7 @@ export class AddPage implements OnInit{
       title: result.name,
       season: 'Box Set',
       id: result.id,
-      mediaType: result.media_type,
+      mediaType: 'tv',
       releaseYear: new Date(result.first_air_date).getFullYear().toString()
     }) 
     console.debug(`MrTracker.AddPage.formatResultsForTvSeasons:: list being returned`, tempOptions)
