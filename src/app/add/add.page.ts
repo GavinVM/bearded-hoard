@@ -22,7 +22,6 @@ export class AddPage implements OnInit{
   icon4K!: string;
   iconBlurayOutline!: string;
   iconBluray!: string;
-  isToast!: boolean;
   isActionSheet!: boolean;
   isSeasonDetailsRunning!: boolean;
   isOnline!: boolean;
@@ -32,7 +31,7 @@ export class AddPage implements OnInit{
   existingEntryData!: {id:string, format:string};
   currentTrackerList!: Entry[];
   seasonsDetails!: any
-  removeExistingEtryActionSheetButtons!: any;
+  removeExistingEntryActionSheetButtons!: any;
 
   isSavedBluray!: Map<string, boolean>;
   isSaved4k!: Map<string, boolean>;
@@ -58,7 +57,6 @@ export class AddPage implements OnInit{
     this.isSaved4k = new Map();
     this.isLoadingBluray = new Map();
     this.isLoading4k = new Map();
-    this.isToast = false;
     this.existingEntryData = {id:'', format:''}
     this.icon4KOutline = environment.icons('4k', true);
     this.icon4K = environment.icons('4k');
@@ -74,7 +72,7 @@ export class AddPage implements OnInit{
       this.currentTrackerList = trackerList;
       console.info(`MrTracker.AddPage.ngOnInit.trackerListEventEmitter:: handeled`)
     })
-    this.removeExistingEtryActionSheetButtons = [
+    this.removeExistingEntryActionSheetButtons = [
         {
           text: 'Continue',
           role: 'cancel',
@@ -186,7 +184,7 @@ export class AddPage implements OnInit{
       title: result.name,
       season: 'Box Set',
       id: result.id,
-      mediaType: result.media_type,
+      mediaType: 'tv',
       releaseYear: new Date(result.first_air_date).getFullYear().toString()
     }) 
     console.debug(`MrTracker.AddPage.formatResultsForTvSeasons:: list being returned`, tempOptions)
@@ -233,12 +231,12 @@ export class AddPage implements OnInit{
     this.appDataService.saveSelection(selection)
   }
 
-  async createToast(toastMessage:string, color?:string | 'default'){
+  async createToast(toastMessage:string, color?:string){
 
     const toast = await this.toastController.create({
       message: toastMessage,
       duration: 3000,
-      color: color
+      color: color ?? 'default'
     });
     await toast.present();
 
@@ -250,10 +248,10 @@ export class AddPage implements OnInit{
     if(selectionResponse.status){
       console.log(`mrTracker.AddPage.saveEntry:: saved, triggering toast`)
       this.createToast(`${selectionResponse.item.title} was saved in ${this.currentFormat}`, 'success');
-      this.isToast = true;
       this.appDataService.getTrackerList();
     } else {
       console.error(`mrTracker.AddPage.saveEntry:: fail, error message - ${selectionResponse.errorMessage}`)
+      this.createToast('Error in saving, clear search and try again.', 'danger');
     }
     console.log(`mrTracker.AddPage.saveEntry:: saving process finished, loading complete`)
     if(this.currentFormat == '4k'){
