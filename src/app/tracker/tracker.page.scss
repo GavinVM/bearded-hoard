@@ -1,0 +1,48 @@
+ion-grid{
+  --ion-grid-column-padding: 0px;
+}
+
+.mediaIcons{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+.mediaIcon{
+  margin: 0px 2px;
+  border-radius: 5px;
+  background-color: var(--ion-background-color-step-250);
+  opacity: 0.8;
+}
+
+
+
+.seasonTitle{
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  color: white;
+  width: 100%;
+  font-weight: 600;
+  opacity: 0.45;
+}
+
+@media screen and (min-width: 1024px) {
+  .seasonTitle{
+    font-size: 3vw;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  .seasonTitle{
+    font-size: 5vw;
+  }
+}
+
+.mrtrkIcon{
+  transform: scale(0.6);
+  border-radius: 5px;
+  margin-top: -15%;
+  margin-bottom: -15%;
+  padding-left: 5vw;
+}

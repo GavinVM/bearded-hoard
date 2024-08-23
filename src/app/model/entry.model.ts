@@ -1,10 +1,15 @@
-import { Genre } from "./genre.model"
-
 export interface Entry {
-    title: string,
-    overview: string,
+    title: string
+    overview: string
     image: string
-    genres: Genre[],
-    apiId: number,
-    kind: string
+    genres: Genre[]
+    apiId: string
+    mediaType: string
+    season?: string
+    format: string[]
+}
+
+interface Genre {
+    id: number
+    name:string
 }

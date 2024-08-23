@@ -1,0 +1,85 @@
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <svg class="ios-notch" viewBox="0 0 219 31">
+      <path d="M0 1V0h219v1a5 5 0 0 0-5 5v3c0 12.15-9.85 22-22 22H27C14.85 31 5 21.15 5 9V6a5 5 0 0 0-5-5z" fill-rule="evenodd"></path>
+    </svg>
+    <ion-title class="exampleTitle">
+      Mr Tracker
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+@if(!isLoading) {
+<ion-header>
+  <ion-toolbar>
+    <ion-segment slot="start" (ionChange)="toggleGridListView($event)" [value]="isGrid? 'grid' : 'list'">
+      <ion-segment-button value="grid">
+        <ion-icon name="grid-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="list">
+        <ion-icon name="list-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>       
+  </ion-toolbar>
+</ion-header>
+}
+@else {
+  <ion-loading [isOpen]="isLoading" message="Loading List..."></ion-loading>
+}
+
+<ion-content [fullscreen]="true">
+  @if(!isLoading){
+    @if(isGrid){
+      <ion-grid>
+        <ion-row>
+          @for(entry of trackerList; track entry.title){
+            <ion-col size="4" size-md="6" size-sm="12">
+              <ion-card>
+                <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
+                <div class="mediaIcons">
+                  @for(format of entry.format; track $index){
+                    <img [src]="getMediaTypeIcon(format)" class="mediaIcon"/>
+                  }
+                </div>
+                @if(entry.mediaType == 'tv'){
+                  <span class="seasonTitle mediaIcon">{{entry.season}}</span>
+                }
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    }
+    @else {
+      <ion-list [inset]="true">
+       
+      @for(entry of trackerList; track entry.title){
+        <ion-item>
+          <ion-label>
+            {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
+            <ion-note>  {{formatDetail(entry)}}...</ion-note>
+          </ion-label>
+        </ion-item>
+      }
+      </ion-list>
+    }
+  }
+  <ion-tabs>
+
+    <ion-tab-bar slot="botton" class="tabsAdjust">
+      <ion-tab-button >
+        <ion-icon aria-hidden="true" name="add-circle-outline"></ion-icon>
+        <ion-label>Add</ion-label>
+      </ion-tab-button>
+  
+      <ion-tab-button>
+        <ion-icon aria-hidden="true" name="film-outline"></ion-icon>
+        <ion-label>Tracker</ion-label>
+      </ion-tab-button>
+  
+      <ion-tab-button>
+        <ion-icon aria-hidden="true" [src]="cexOutline"></ion-icon>
+        <ion-label>Cex</ion-label>
+      </ion-tab-button>
+  
+    </ion-tab-bar>

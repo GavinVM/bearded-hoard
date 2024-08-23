@@ -1,0 +1,54 @@
+@if(isLandingPage){
+  <ion-header>
+    <ion-toolbar>
+      <!-- <ion-title> -->
+        <img src="../assets/logo/app-iconset/48.png" alt="mrtrkIcon">
+      <!-- </ion-title> -->
+    </ion-toolbar>
+  </ion-header>
+  <ion-grid>
+    <ion-row class="ion-align-items-end">
+      <ion-col size-xxl="6" size-xl="7" size-lg="8" size-md="12" size-sm="12" size-sx="12">
+        <h1>MrTracker</h1>
+        <h5>Mobile app</h5>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset-xl="1" offset-lg="0" size-xl="6" size-lg="10" size-md="10" size-sm="10" size-sx="12" offset-md="1" class="groupFont">
+        <p>App to tack your Blu-ray&trade;/4K Blu-ray&trade;'s collection, with the intent to not have to rememeber 
+          when you are buying more to grow your collection.
+          <br>
+          <br>
+          Intented to be used as a app on your device, using the add to home page as method of download and will work offline once 
+          titles are saved.
+        </p>
+      </ion-col>
+      <ion-col offset-xl="1" offset-lg="3" offset-md="3" offset-sm="2" offset-xs="1">
+        <iframe src="example" frameborder="0" [class]="largeScreenAjustment"></iframe>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+}
+@else {
+  <ion-tabs (ionTabsWillChange)="tabChangeHandler($event)">
+
+    <ion-tab-bar slot="botton">
+      <ion-tab-button tab="add" href="/tabs/add">
+        <ion-icon aria-hidden="true" name="add-circle-outline"></ion-icon>
+        <ion-label>Add</ion-label>
+      </ion-tab-button>
+  
+      <ion-tab-button tab="tracker" href="/tabs/tracker">
+        <ion-icon aria-hidden="true" name="film-outline"></ion-icon>
+        <ion-label>Tracker</ion-label>
+      </ion-tab-button>
+  
+      <ion-tab-button tab="cex" href="/tabs/cex">
+        <ion-icon aria-hidden="true" [src]="cexOutline"></ion-icon>
+        <ion-label>Cex</ion-label>
+      </ion-tab-button>
+  
+    </ion-tab-bar>
+  
+  </ion-tabs>
+}
