@@ -46,6 +46,8 @@ yarn-error.log
 *.sublime-project
 *.sublime-workspace
 .localNotes/*
+.codesandbox/*
+.devcontainer/*
 
 # Visual Studio Code
 .vscode/*
