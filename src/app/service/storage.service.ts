@@ -28,13 +28,13 @@ export class StorageService {
     console.log(`mrTracker.StorageService.init:: finishing`)    
   }
 
-  setStorageStatus(){
-    this.storageReadyEmitter.emit(true)
-  }
+  // setStorageStatus(){
+  //   this.storageReadyEmitter.emit(true)
+  // }
 
-  storageReadySubscription(){
-    return this.storageReadyEmitter
-  }
+  // storageReadySubscription(){
+  //   return this.storageReadyEmitter
+  // }
 
   async setEntry(key: string, value: any): Promise<StorageResponse>{
       try {
