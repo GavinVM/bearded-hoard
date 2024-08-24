@@ -28,14 +28,6 @@ export class StorageService {
     console.log(`mrTracker.StorageService.init:: finishing`)    
   }
 
-  // setStorageStatus(){
-  //   this.storageReadyEmitter.emit(true)
-  // }
-
-  // storageReadySubscription(){
-  //   return this.storageReadyEmitter
-  // }
-
   async setEntry(key: string, value: any): Promise<StorageResponse>{
       try {
         console.log(`mrTracker.StorageService.setEntry:: starting`)
@@ -65,17 +57,19 @@ export class StorageService {
       if(length == 0){
         this.storageResponse.errorMessage = 'empty'
       } else {
+        let keys = await this.ionStorage.keys();
+        if(!keys.includes(key)) throw 'key not found'
         let item = await this.ionStorage.get(key);
-        if(item == null) throw 'key not found'
+        
         this.storageResponse.status = true;
         this.storageResponse.item = item
         console.debug(`mrTracker.StorageService.getEntry:: got entry for ${key}`, item)
       }
       
     } catch (error) {
-      console.error(`mrTracker.StorageService.getEntry:: issue getting item for key ${key} `)
+      console.error(`mrTracker.StorageService.getEntry:: issue getting item for key ${key}, `, error)
       this.storageResponse.status = false;
-      this.storageResponse.errorMessage = `entry for id ${key} does not exist`
+      this.storageResponse.errorMessage = `issue for ${key}, error message: \n\t\t\t${error}`
     }
     console.log(`mrTracker.StorageService.getEntry:: finishing`)
     return this.storageResponse;
