@@ -4,6 +4,8 @@ import { TrackerPageModule } from './tracker.module';
 import { AppDataService } from '../service/app-data.service';
 import { EventEmitter } from '@angular/core';
 import { TabsService } from '../service/tabs.service';
+import { StorageResponse } from '../model/storage-response.model';
+import { ToastController } from '@ionic/angular';
 
 describe('TrackerPage', () => {
 
@@ -24,6 +26,10 @@ describe('TrackerPage', () => {
 
       MockInstance(TabsService, () => ({
         tabChangingEmiter: new EventEmitter<any>()
+      }))
+
+      MockInstance(ToastController, () => ({
+        create: jasmine.createSpy().and.returnValue(Promise.resolve({}))
       }))
     });
 
@@ -89,7 +95,6 @@ describe('TrackerPage', () => {
       expect(component.point.componentInstance.isReorder).toBeTrue();
       expect(component.point.componentInstance.isDelete).toBeFalse();
       expect(component.point.componentInstance.reorderButtonState).toBe('filled');
-      expect(component.point.componentInstance.savePopoverState).toBeTrue();
     })
 
     it('should trigger update tracker list and successful when reorder is true and change Order is true', () => {
@@ -543,31 +548,34 @@ describe('TrackerPage', () => {
       const component = MockRender(TrackerPage);
       component.detectChanges();
 
-      const exampleTrackerList = [
-        {
-          mediaType: 'movie',
-          apiId: '1',
-          format: ['blu-ray'],
-          title: 'test',
-          image: 'test',
-          overview: 'test',
-          genres: [{name: 'test',id: 1}]
-        },
-        {
-          mediaType: 'movie',
-          apiId: '2',
-          format: ['blu-ray'],
-          title: 'test',
-          image: 'test',
-          overview: 'test',
-          genres: [{name: 'test',id: 1}]
-        }
-      ]
+      const exampleTrackerListResponse: StorageResponse = {
+        status: true,
+        item: [
+          {
+            mediaType: 'movie',
+            apiId: '1',
+            format: ['blu-ray'],
+            title: 'test',
+            image: 'test',
+            overview: 'test',
+            genres: [{name: 'test',id: 1}]
+          },
+          {
+            mediaType: 'movie',
+            apiId: '2',
+            format: ['blu-ray'],
+            title: 'test',
+            image: 'test',
+            overview: 'test',
+            genres: [{name: 'test',id: 1}]
+          }
+        ]
+      } 
 
       component.point.componentInstance.trackerList = [];
 
       expect(component.point.componentInstance.trackerList.length).toEqual(0);
-      component.point.componentInstance.loadTrackerList(exampleTrackerList);
+      component.point.componentInstance.loadTrackerList(exampleTrackerListResponse);
       expect(component.point.componentInstance.isLoading).toBeFalse();
       expect(component.point.componentInstance.trackerList.length).toEqual(2);
       

@@ -25,7 +25,7 @@ export class AppDataService {
   setTimeoutId: Map<string, any> = new Map();
 
   savedEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
-  trackerListEventEmittter: EventEmitter<Entry[]> = new EventEmitter()
+  trackerListEventEmittter: EventEmitter<StorageResponse> = new EventEmitter()
   cexListReadyEmitter: EventEmitter<CexEntry[]> = new EventEmitter()
 
   constructor(private http: HttpClient,
@@ -156,6 +156,7 @@ export class AppDataService {
   }
 
   updateTrackerList(tracketList: Entry[]): Promise<StorageResponse>{
+    console.info(`mrTracker.AppDataService.updateTrackerList:: called`)
     return this.storageService.setEntry(TRACKER_LIST, tracketList)
   }
 
@@ -163,11 +164,11 @@ export class AppDataService {
     this.getList(TRACKER_LIST).then((response:StorageResponse) => {
       if(response.status){
         console.info(`mrTracker.AppDataService.getTrackerList:: storage ready triggering trackerList event`)
-        this.trackerListEventEmittter.emit(response.item?? [])
+        this.trackerListEventEmittter.emit(response)
       } else {
         if(response.errorMessage){
           console.info('mrTracker.AppDataService.getTrackerList:: list empty, triggering trackerList with empty list')
-          this.trackerListEventEmittter.emit([])
+          this.trackerListEventEmittter.emit(response)
         } else {
           console.info(`mrTracker.AppDataService.getTrackerList:: storage not ready, retrying in 2 seconds`)
           if(this.handleRetryCount('getTrackerList', () => this.getTrackerList(), 1000)){
@@ -179,6 +180,17 @@ export class AppDataService {
         }
       }
     });
+  }
+
+  createTrackerList(): void{
+    this.storageService.setEntry(TRACKER_LIST, []).then((response:StorageResponse) => {
+      if(response.status){
+        console.info(`mrTracker.AppDataService.createTrackerList:: storage ready triggering trackerList event`)
+      } else {
+        console.error(`mrTracker.AppDataService.createTrackerList:: setting trakcer list failed`, response.errorMessage);
+      }
+      this.trackerListEventEmittter.emit(response)
+    })
   }
 
   handleRetryCount(method: string, retryFunction: () => void, duration: number = 1000): boolean {
