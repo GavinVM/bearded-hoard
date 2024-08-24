@@ -66,10 +66,14 @@ export class AddPage implements OnInit{
     this.isOnline = true;
     this.appDataService.savedEventEmittter.subscribe(response => this.handleSavingEvent(response));
     this.tabService.tabChangingEmiter.subscribe(tab => this.tabChange(tab));
-    this.appDataService.trackerListEventEmittter.subscribe((trackerList:Entry[]) => {
+    this.appDataService.trackerListEventEmittter.subscribe((trackerResponse:StorageResponse) => {
       console.info(`MrTracker.AddPage.ngOnInit.trackerListEventEmitter:: triggered`)
-      console.debug(`MrTracker.AddPage.ngOnInit.trackerListEventEmitter:: setting current list to,`, trackerList)
-      this.currentTrackerList = trackerList;
+      console.debug(`MrTracker.AddPage.ngOnInit.trackerListEventEmitter:: response recieved,`, trackerResponse)
+      if(trackerResponse.status){ 
+        this.currentTrackerList = trackerResponse.item 
+      } else {
+        this.currentTrackerList = []
+      } 
       console.info(`MrTracker.AddPage.ngOnInit.trackerListEventEmitter:: handeled`)
     })
     this.removeExistingEntryActionSheetButtons = [

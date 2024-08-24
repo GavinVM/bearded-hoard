@@ -4,7 +4,7 @@ import { Entry } from '../model/entry.model';
 import { StorageResponse } from '../model/storage-response.model';
 import { TabsService } from '../service/tabs.service';
 import { environment } from 'src/environments/environment';
-import { IonCheckbox, ItemReorderEventDetail } from '@ionic/angular';
+import { IonCheckbox, ItemReorderEventDetail, ToastController } from '@ionic/angular';
 
 const GRID: string = 'grid';
 const TOGGLED: string = 'filled';
@@ -27,7 +27,7 @@ export class TrackerPage implements OnInit{
   isModalOpen!:boolean;
   isToast!: boolean;
   changeReorder!: boolean;
-  savePopoverState!: boolean;
+  isCreatingTrackerList!:boolean;
   trackerList!: Entry[];
   previousTrackerList!: Entry[];
   removeEntryList!: Entry[];
@@ -38,7 +38,8 @@ export class TrackerPage implements OnInit{
   toastMessage!:string;
 
   constructor(private appDataService: AppDataService,
-              private tabService: TabsService) {}
+              private tabService: TabsService,
+              private toastController: ToastController) {}
 
   ngOnInit(){
     console.info(`mrTracker.TrackerPage.ngOnInit:: starting`)
@@ -49,7 +50,7 @@ export class TrackerPage implements OnInit{
     this.isDelete = false;
     this.isModalOpen = false;
     this.changeReorder = false;
-    this.savePopoverState = false;
+    this.isCreatingTrackerList = false;
     this.reorderButtonState = PENDING;
     this.deleteEntryButtonState = PENDING;
     this.toastMessage = '';
@@ -58,7 +59,7 @@ export class TrackerPage implements OnInit{
     this.removeEntryList = [];
     this.imagePreFix = environment.tmdbImageBase;
     this.tabService.tabChangingEmiter.subscribe(tab => this.activeTabReload(tab))
-    this.appDataService.trackerListEventEmittter.subscribe(trackerList => this.loadTrackerList(trackerList))
+    this.appDataService.trackerListEventEmittter.subscribe((trackerList:StorageResponse) => this.loadTrackerList(trackerList))
     this.appDataService.getTrackerList();
     console.info(`mrTracker.TrackerPage.ngOnInit:: finishing`)
   }
@@ -74,11 +75,24 @@ export class TrackerPage implements OnInit{
     console.info(`mrTracker.TrackerPage.activeTabReload:: finishing`)
   }
 
-  loadTrackerList(trackerList: Entry[]){
+  loadTrackerList(trackerResponse: StorageResponse){
     console.info(`mrTracker.TrackerPage.loadTrackerList:: ${this.isWaitingForStorage ? 'restarting' : 'starting'}`)
-
-    this.trackerList = trackerList;
-    this.isLoading = false;
+    if(trackerResponse.status){
+      this.trackerList = trackerResponse.item
+      this.isLoading = false;
+      console.debug(`mrTracker.TrackerPage.loadTrackerList:: got the list:`, this.trackerList)
+    } else {
+      if(!this.isCreatingTrackerList){
+        this.isCreatingTrackerList = true;
+        this.appDataService.createTrackerList();
+      } else {
+        console.error(`mrTracker.TrackerPage.loadTrackerList:: error creating tracker list`)
+        console.error(trackerResponse.errorMessage);
+        this.isLoading = false;
+      }
+    }
+    
+    
     console.debug(`mrTracker.TrackerPage.loadTrackerList:: got the list:`, this.trackerList)
     console.info(`mrTracker.TrackerPage.loadTrackerList:: finishing`)
   }
@@ -198,7 +212,6 @@ export class TrackerPage implements OnInit{
       this.isReorder = true;
       this.isDelete = false;
       this.reorderButtonState = TOGGLED
-      this.savePopoverState = true;
       console.info(`mrTracker.TrackerPage.toggleReorder:: ready to accept changes`)
     } else if(this.isReorder) {
       console.info(`mrTracker.TrackerPage.toggleReorder:: setting to false`)
@@ -210,7 +223,16 @@ export class TrackerPage implements OnInit{
         if(!response.status){
           console.info(`mrTracker.TrackerPage.toggleReorder:: issue saving new order: \n\t\t\t\t${response.errorMessage}`)
           console.info(`mrTracker.TrackerPage.toggleReorder:: reverting changes`)
-          this.toastMessage = 'Reorder Failed, please try again'
+          this.createToast('Reorder Failed, please try again');
+          this.trackerList = [...this.previousTrackerList];
+          this.isReorder = true;
+          this.changeReorder = false;
+        } else {
+          this.createToast('Reorder Successful');
+          this.isReorder = false;
+          this.changeReorder = false;
+          this.isDelete = false;
+          this.reorderButtonState = PENDING
         } 
         this.isLoading = false;
       });
@@ -238,6 +260,17 @@ export class TrackerPage implements OnInit{
     this.changeReorder = false;
     console.debug(`mrTracker.TrackerPage.trackerList:: trackerlist reset`)
     console.info(`mrTracker.TrackerPage.trackerList:: finishing`)
+  }
+
+  async createToast(toastMessage:string, color?:string){
+
+    const toast = await this.toastController.create({
+      message: toastMessage,
+      duration: 2000,
+      color: color ?? 'default'
+    });
+    await toast.present();
+
   }
 
   getMediaTypeIcon(mediaType:string): string{

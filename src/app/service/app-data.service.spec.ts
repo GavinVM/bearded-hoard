@@ -263,8 +263,8 @@ describe('AppDataService', () => {
       const appDataService = MockRender(AppDataService).point.componentInstance;
       appDataService.isStorageReady = true;
       appDataService.getTrackerList()
-      appDataService.trackerListEventEmittter.subscribe((trackerList: Entry[]) => {
-        expect(trackerList.length).toBe(1);
+      appDataService.trackerListEventEmittter.subscribe((trackerResponse: StorageResponse) => {
+        expect(trackerResponse.item.length).toBe(1);
       })
 
     });
@@ -295,8 +295,8 @@ describe('AppDataService', () => {
       const appDataService = MockRender(AppDataService).point.componentInstance;
       appDataService.isStorageReady = true;
       appDataService.getTrackerList()
-      appDataService.trackerListEventEmittter.subscribe((trackerList: Entry[]) => {
-        expect(trackerList.length).toBe(0);
+      appDataService.trackerListEventEmittter.subscribe((trackerResponse: StorageResponse) => {
+        expect(trackerResponse.item.length).toBe(0);
       })
 
     });
@@ -386,7 +386,5 @@ describe('AppDataService', () => {
  });
   
  afterEach(() => MockInstance.restore());
-
- afterAll(() => clearTimeout);
     
 })
