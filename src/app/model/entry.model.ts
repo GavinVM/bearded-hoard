@@ -6,6 +6,7 @@ export interface Entry {
     apiId: string
     mediaType: string
     season?: string
+    seasonId?: string
     format: string[]
 }
 

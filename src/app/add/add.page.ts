@@ -141,15 +141,16 @@ export class AddPage implements OnInit{
 
               console.debug(`MrTracker.AddPage.getResults:: is ${result.title} exist in current list - ${tempExistingEntry.length > 0}, if so in what fomat,`, tempFormat)
 
-              this.isSavedBluray.set(result.id, tempFormat.indexOf('bluray') != -1);
-              this.isSaved4k.set(result.id, tempFormat.indexOf('4k') != -1);
-              this.isLoadingBluray.set(result.id, false);
-              this.isLoading4k.set(result.id, false);
+              
               if(result.media_type != 'movie') {
-                this.formatResultsForTvSeasons(result).forEach((season:any) => {
+                this.formatResultsForTvSeasons(result, tempFormat).forEach((season:any) => {
                   this.options.push(season);
                 })
               } else {
+                this.isSavedBluray.set(result.id, tempFormat.indexOf('bluray') != -1);
+                this.isSaved4k.set(result.id, tempFormat.indexOf('4k') != -1);
+                this.isLoadingBluray.set(result.id, false);
+                this.isLoading4k.set(result.id, false);
                 this.options.push({
                   title: result.title,
                   id: result.id,
@@ -171,23 +172,34 @@ export class AddPage implements OnInit{
     }
   }
 
-  formatResultsForTvSeasons(result:any){
+  formatResultsForTvSeasons(result:any, tempFormat: string[] = []): any[] {
     console.info("`mrTracker.AddPage.formatResultsForTvSeasons:: starting", result)
     let tempOptions: any[] = [];
     result.seasons.forEach((season:any) => {
+      this.isSavedBluray.set(season.id, tempFormat.indexOf('bluray') != -1);
+      this.isSaved4k.set(season.id, tempFormat.indexOf('4k') != -1);
+      this.isLoadingBluray.set(season.id, false);
+      this.isLoading4k.set(season.id, false);
       tempOptions.push({
         title: result.name,
         season: season.name,
-        id: result.id,
+        parentId: result.id,
+        id: season.id,
         mediaType: 'tv',
         releaseYear: new Date(season.air_date).getFullYear().toString()
       })
     });
 
+    this.isSavedBluray.set(result.id, tempFormat.indexOf('bluray') != -1);
+      this.isSaved4k.set(result.id, tempFormat.indexOf('4k') != -1);
+      this.isLoadingBluray.set(result.id, false);
+      this.isLoading4k.set(result.id, false);
+
     tempOptions.push({
       title: result.name,
       season: 'Box Set',
       id: result.id,
+      parentId: result.id,
       mediaType: 'tv',
       releaseYear: new Date(result.first_air_date).getFullYear().toString()
     }) 
@@ -259,11 +271,11 @@ export class AddPage implements OnInit{
     }
     console.log(`mrTracker.AddPage.saveEntry:: saving process finished, loading complete`)
     if(this.currentFormat == '4k'){
-      console.log(`mrTracker.AddPage.saveEntry:: setting id ${selectionResponse.item.apiId} 4k loading to false`, this.isLoading4k)
-      this.isLoading4k.set(selectionResponse.item.apiId, false)
+      console.log(`mrTracker.AddPage.saveEntry:: setting id ${(selectionResponse.item.mediaType =='tv' ? selectionResponse.item.seasonId : selectionResponse.item.apiId)} 4k loading to false`, this.isLoading4k)
+      this.isLoading4k.set((selectionResponse.item.mediaType =='tv' ? selectionResponse.item.seasonId : selectionResponse.item.apiId), false)
     } else {
-      console.log(`mrTracker.AddPage.saveEntry:: setting id ${selectionResponse.item.apiId} bluray loading to false`, this.isLoadingBluray)
-      this.isLoadingBluray.set(selectionResponse.item.apiId, false)
+      console.log(`mrTracker.AddPage.saveEntry:: setting id ${(selectionResponse.item.mediaType =='tv' ? selectionResponse.item.seasonId : selectionResponse.item.apiId)} bluray loading to false`, this.isLoadingBluray)
+      this.isLoadingBluray.set((selectionResponse.item.mediaType =='tv' ? selectionResponse.item.seasonId : selectionResponse.item.apiId), false)
     }
     this.currentFormat = '';
   }
