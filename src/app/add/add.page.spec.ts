@@ -186,6 +186,7 @@ describe('AddPage', () => {
         getTrackerList: jasmine.createSpy(),
         trackerListEventEmittter: new EventEmitter<any>(),
         savedEventEmittter: new EventEmitter<any>(),
+        tabChangingEmiter: new EventEmitter<any>(),
         getSearchResults: jasmine.createSpy().and.returnValue(of({results: [
           {
             id: '1',
@@ -272,6 +273,7 @@ describe('AddPage', () => {
         id: 1,
         name: 'test',
         seasons: [{
+          id: 2,
           name: 'season-1',
           air_date: '2010-12-05'
         }],
@@ -282,7 +284,8 @@ describe('AddPage', () => {
         {
           title: 'test',
           season: 'season-1',
-          id: 1,
+          id: 2,
+          parentId: 1,
           mediaType: 'tv', 
           releaseYear: '2010'
         },
@@ -290,6 +293,7 @@ describe('AddPage', () => {
           title: 'test',
           season: 'Box Set',
           id: 1,
+          parentId: 1,
           mediaType: 'tv', 
           releaseYear: '2010'
         }

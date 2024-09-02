@@ -70,7 +70,7 @@ export class AppDataService {
 
   saveSelection(selection: any): void{
     console.info(`mrTracker.AppDataService.saveSelection:: Starting`)
-    let details = selection.mediaType === 'tv'? this.geTvDetailsById(selection.id) : this.getMovieDetailsById(selection.id);
+    let details = selection.mediaType === 'tv'? this.geTvDetailsById(selection.parentId) : this.getMovieDetailsById(selection.id);
     let savingResponce: StorageResponse = {status: false};
     console.debug(`mrTracker.AppDataService.saveSelection:: setting details call and reponse object`)
     
@@ -90,15 +90,22 @@ export class AppDataService {
         let updateIndex: number;
 
         if(tempList.length > 0){
+          console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: entries found, checking for existing entry`)
           let tempEntry = tempList.filter((entry: Entry, index: number) => {
-            if(entry.apiId == selection.id){
+            let tempSelectionId = selection.mediaType === 'tv'? selection.parentId : selection.id
+            let tempEntryId = entry.mediaType === 'tv'? entry.seasonId  : entry.apiId
+            console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: checking for entry with passed in id and existing id`, tempSelectionId, tempEntryId)
+            if(tempEntryId == tempSelectionId){
+              console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: found entry marking index for updating`, index)
               updateIndex = index;
               return true
             } else {
+              console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: did not find entry`)
               return false
             }
           })
           if(tempEntry.length > 0){
+            console.debug(`mrTracker.AppDataService.saveSelection.storageService.getEntry:: entries for updating found, updating format`)
             updateEntry = tempEntry[0];
             updateEntry.format.push(selection.format)
             isUpdate = true;
@@ -120,7 +127,8 @@ export class AppDataService {
                   apiId: detail.id,
                   mediaType: selection.mediaType,
                   format: [selection.format],
-                  season: selection.season
+                  season: selection.season,
+                  seasonId: selection.id,
                 }
               )
             }
