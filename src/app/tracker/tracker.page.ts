@@ -135,6 +135,10 @@ export class TrackerPage implements OnInit{
     console.info(`mrTracker.TrackerPage.toggleCheckBoxes:: finish`)
   }
 
+  getDeleteEntryId(entry:Entry):string{
+    return entry.mediaType === 'tv' ? entry.seasonId?? entry.apiId : entry.apiId
+  }
+
   toggleDelete(){
     console.info(`mrTracker.TrackerPage.toggleDelete:: starting`)
     if(this.deleteEntryList.length == 0){
@@ -144,7 +148,7 @@ export class TrackerPage implements OnInit{
     } else {
       console.info(`mrTracker.TrackerPage.toggleDelete:: removing entries from list`)
       this.previousTrackerList = [...this.trackerList];
-      this.removeEntryList = this.trackerList.filter((entry:Entry) => this.deleteEntryList.indexOf(entry.apiId) != -1)
+      this.removeEntryList = this.trackerList.filter((entry:Entry) => this.deleteEntryList.indexOf(this.getDeleteEntryId(entry)) != -1)
       console.info(`mrTracker.TrackerPage.toggleDelete:: entries removed, removed list looks like -`, this.removeEntryList)
       console.info(`mrTracker.TrackerPage.toggleDelete:: opening confirm model`)
       this.isModalOpen = true;
@@ -156,16 +160,16 @@ export class TrackerPage implements OnInit{
     return this.deleteEntryList.indexOf(id) != -1
   }
 
-  updateDeleteEntryList(apiId:string, checked:boolean){
+  updateDeleteEntryList(entryId:string, checked:boolean){
     console.info(`mrTracker.TrackerPage.updateDeleteEntryList:: starting`)
-    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: current checked status is ${checked} and id is ${apiId}`)
+    console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: current checked status is ${checked} and id is ${entryId}`)
     
     if(checked){
       console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: adding id to list`)
-      this.deleteEntryList.push(apiId);
+      this.deleteEntryList.push(entryId);
     } else {
       console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: removing id`)
-      this.deleteEntryList = this.deleteEntryList.filter((id:string) => id != apiId);
+      this.deleteEntryList = this.deleteEntryList.filter((id:string) => id != entryId);
     }
     console.debug(`mrTracker.TrackerPage.updateDeleteEntryList:: delete list is now`, this.deleteEntryList)
     console.info(`mrTracker.TrackerPage.updateDeleteEntryList:: finishing`)
@@ -179,7 +183,7 @@ export class TrackerPage implements OnInit{
     } else {
       console.info(`mrTracker.TrackerPage.deleteEntries:: removing entries from list`)
       this.isLoading = true;
-      this.trackerList = this.trackerList.filter((entry:Entry) => this.deleteEntryList.indexOf(entry.apiId) == -1)
+      this.trackerList = this.trackerList.filter((entry:Entry) => this.deleteEntryList.indexOf(this.getDeleteEntryId(entry)) == -1)
       console.info(`mrTracker.TrackerPage.deleteEntries:: entries removed, removed list looks like -`, this.removeEntryList)
       this.appDataService.updateTrackerList(this.trackerList).then((response:StorageResponse) => {
         console.info(`mrTracker.TrackerPage.deleteEntries.updateTrackerList:: response - `, response)
@@ -193,6 +197,7 @@ export class TrackerPage implements OnInit{
           this.deleteEntryList = [];
           this.isLoading = false;
           this.isToast = true;
+          this.appDataService.trackerListEventEmittter.emit(response);
         } else {
           this.toastMessage = 'Error deleting , please try again';
         }
