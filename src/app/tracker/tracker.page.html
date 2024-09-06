@@ -78,7 +78,7 @@
   @if(isGrid){
     <ion-grid>
       <ion-row>
-        @for(entry of trackerList; track entry.title){
+        @for(entry of trackerList; track entry.mediaType === 'tv' ? entry.seasonId : entry.apiId){
           <ion-col size="4" size-md="2" size-sm="2">
             <ion-card>
               <img alt="movie Tile" src="{{imagePreFix + entry.image}}"/>
@@ -99,24 +99,24 @@
   @else {
     <ion-list [inset]="true">
       @if(isDelete){
-        @for(entry of trackerList; track entry.title){
+        @for(entry of trackerList; track entry.mediaType === 'tv' ? entry.seasonId : entry.apiId){
           <ion-item>
               <ion-label>
                 {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
                 <ion-note>  {{formatDetail(entry)}}...</ion-note>
               </ion-label>
-              @if(deleteEntryList.indexOf(entry.apiId) != -1){
-                <ion-icon  slot="end" name="checkmark-circle" (click)="updateDeleteEntryList(entry.apiId, false)"></ion-icon>
+              @if(deleteEntryList.indexOf(getDeleteEntryId(entry)) != -1){
+                <ion-icon  slot="end" name="checkmark-circle" (click)="updateDeleteEntryList(getDeleteEntryId(entry), false)"></ion-icon>
               }
               @else {
-                <ion-icon  slot="end" name="ellipse-outline" (click)="updateDeleteEntryList(entry.apiId, true)"></ion-icon>
+                <ion-icon  slot="end" name="ellipse-outline" (click)="updateDeleteEntryList(getDeleteEntryId(entry), true)"></ion-icon>
               }
           </ion-item>
         }
       }
       @else if(isReorder){
         <ion-reorder-group [disabled]="!isReorder" (ionItemReorder)="handleReorder($any($event))">
-          @for(entry of trackerList; track entry.title){
+          @for(entry of trackerList; track entry.mediaType === 'tv' ? entry.seasonId : entry.apiId){
             <ion-item>
               <ion-label>
                 {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
@@ -129,7 +129,7 @@
           }
         </ion-reorder-group>
       }@else {
-          @for(entry of trackerList; track entry.title){
+          @for(entry of trackerList; track entry.mediaType === 'tv' ? entry.seasonId : entry.apiId){
             <ion-item>
               <ion-label>
                 {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
@@ -161,7 +161,7 @@
           </ion-label>
         </ion-list-header>
         <ion-list>
-          @for(entry of removeEntryList; track entry.title){
+          @for(entry of removeEntryList; track entry.mediaType === 'tv' ? entry.seasonId : entry.apiId){
             <ion-item color="light">
               <ion-label>
                 {{entry.title}}  @if(entry.mediaType == 'tv'){: {{entry.season}} }
